@@ -817,6 +817,20 @@ header .goldbtn{color:#17251f!important;background:#d5a044!important;border:0!im
 header .navright .goldbtn{position:relative;z-index:1;color:#17251f!important;background:#d5a044!important;border:0!important;isolation:isolate}
 header .navright .iconbtn{font-family:Arial,sans-serif;font-size:21px;line-height:1}
 .hero .eyebrow{color:#f2d89e}
+/* Keep the navigation visibly anchored, then give the hero more breathing room. */
+header{background:#f4f7f3!important;border-bottom:1px solid rgba(18,61,53,.16)!important;box-shadow:0 8px 26px rgba(13,43,34,.13)!important}
+.hero h1{font-size:clamp(44px,4.5vw,70px)!important;line-height:1.14!important;letter-spacing:-1.5px!important;margin:22px 0 16px!important}
+.hero p{font-size:clamp(15px,1.1vw,18px)!important;max-width:740px!important;margin-bottom:30px!important}
+.hero .searchbar{width:min(1040px,calc(100% - 48px))!important;max-width:1040px!important;padding:7px!important;border-radius:17px!important}
+.hero .searchfield{padding:0 15px!important}
+.hero .searchfield input,.hero .searchfield select{font-size:15px!important}
+.hero .searchbar .searchsubmit{min-height:54px!important;padding:0 26px!important}
+@media(max-width:760px){
+ header{background:#f4f7f3!important;box-shadow:0 5px 18px rgba(13,43,34,.12)!important}
+ .hero h1{font-size:clamp(37px,9vw,47px)!important}
+ .hero .searchbar{width:100%!important;max-width:100%!important}
+ .hero .searchbar .searchsubmit{min-height:48px!important}
+}
 </style>
 </head>
 <body>
