@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#123d35">
+<title>MAKONI — O‘z makoningizni toping</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap');
+:root{--green:#123d35;--green2:#1d5146;--gold:#d5a044;--gold2:#e9c77e;--ink:#17241f;--muted:#7b8580;--paper:#f8f6f1;--line:#e9e4da;--white:#fff;--shadow:0 12px 36px rgba(20,42,34,.08)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font-family:'DM Sans',sans-serif}button,input,select{font:inherit}button{cursor:pointer}.wrap{width:min(1440px,calc(100% - 64px));margin:auto}
+header{height:86px;background:#fffdfa;border-bottom:1px solid #eee9df;display:flex;align-items:center;position:sticky;top:0;z-index:20}.nav{display:flex;align-items:center;justify-content:space-between;gap:28px}.brand{display:flex;align-items:center;text-decoration:none;min-width:190px}.brand svg{width:196px;height:auto}.navlinks{display:flex;align-items:center;gap:38px}.navlinks a{color:#293832;text-decoration:none;font-size:15px;font-weight:500;transition:.2s}.navlinks a:hover{color:var(--gold)}.navright{display:flex;align-items:center;gap:24px}.iconbtn{border:0;background:transparent;color:var(--green);font-size:21px;position:relative}.count{position:absolute;top:-7px;right:-8px;background:var(--gold);color:#fff;border-radius:20px;font-size:10px;padding:2px 5px}.login{border:0;background:transparent;color:var(--ink);font-weight:500}.goldbtn{border:0;background:var(--gold);color:#17251f;border-radius:9px;padding:15px 23px;font-weight:700;transition:.2s}.goldbtn:hover{background:#e1b45f;transform:translateY(-1px)}.mobilemenu{display:none}
+.hero{min-height:650px;position:relative;color:#fff;display:flex;align-items:center;overflow:hidden;background:#0b211b}.hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(3,17,13,.88),rgba(4,22,17,.56) 52%,rgba(4,20,15,.25)),url('https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=2200&q=90');background-image:linear-gradient(90deg,rgba(3,17,13,.88),rgba(4,22,17,.56) 52%,rgba(4,20,15,.25)),url('https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=2200&q=90');background-size:cover;background-position:center 54%;transform:scale(1.01)}
+.hero-content{position:relative;z-index:1;text-align:center;width:min(1120px,calc(100% - 40px));margin:0 auto;padding:78px 0 66px}.eyebrow{display:inline-flex;align-items:center;gap:9px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.09);border-radius:30px;padding:10px 18px;color:#efd18e;font-size:13px;letter-spacing:.08em;text-transform:uppercase}.hero h1{font-family:'Playfair Display',serif;font-size:clamp(42px,5.4vw,76px);line-height:1.12;font-weight:500;margin:26px 0 20px;letter-spacing:-1.5px}.hero h1 span{color:#e9c174}.hero p{font-size:18px;line-height:1.65;color:#e1e5e1;max-width:760px;margin:0 auto 30px}.switch{display:inline-flex;padding:5px;border:1px solid #ffffff54;background:#ffffff20;border-radius:40px;margin-bottom:20px}.switch button{border:0;background:transparent;color:#fff;padding:12px 28px;border-radius:30px;font-weight:600}.switch button.active{background:#fff;color:var(--green)}
+.searchbar{display:grid;grid-template-columns:1.7fr 1.1fr 1fr auto;gap:0;background:#fffdfa;border-radius:12px;padding:9px;max-width:1120px;margin:0 auto;box-shadow:0 15px 50px #0003;color:var(--ink);text-align:left}.searchfield{display:flex;align-items:center;gap:12px;padding:0 18px;border-right:1px solid var(--line);min-width:0}.searchfield svg{width:20px;height:20px;stroke:var(--green);flex:none}.searchfield input,.searchfield select{border:0;outline:0;background:transparent;width:100%;color:#283a33;min-width:0;padding:13px 0}.searchfield select{appearance:auto}.searchbar .searchsubmit{border:0;background:var(--green);color:#fff;border-radius:8px;padding:0 30px;font-weight:700;display:flex;align-items:center;gap:10px}.stats{display:flex;justify-content:center;gap:68px;margin-top:42px}.stat strong{display:block;font-family:'Playfair Display',serif;color:#edc579;font-size:32px;font-weight:600}.stat span{font-size:13px;color:#d2d9d4}
+.section{padding:76px 0}.sectionhead{display:flex;align-items:end;justify-content:space-between;margin-bottom:28px}.kicker{font-size:11px;letter-spacing:.16em;color:#a8792d;font-weight:700;text-transform:uppercase}.section h2{font:500 clamp(30px,3vw,42px)/1.2 'Playfair Display',serif;margin:9px 0 0;color:#172820}.sub{color:var(--muted);margin:9px 0 0;font-size:14px}.textlink{color:var(--green);font-weight:700;text-decoration:none}
+.regiongrid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}.region{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px 16px;transition:.2s;cursor:pointer}.region:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:#d9c08c}.region b{display:block;color:var(--green);font-size:15px}.region span{font-size:12px;color:var(--muted)}
+.listings{padding:65px 0 90px;background:#f4f1ea}.listingtop{display:flex;justify-content:space-between;align-items:end;margin-bottom:25px}.listingtop h2{font:500 38px 'Playfair Display',serif;margin:8px 0 0}.listingtools{display:flex;align-items:center;gap:10px}.toolbtn,.sort{border:1px solid #e1dbcf;background:#fffdfa;border-radius:9px;padding:11px 15px;color:#33443d}.layout{display:grid;grid-template-columns:278px 1fr;gap:26px}.filters{background:#fffdfa;border:1px solid var(--line);border-radius:12px;padding:22px;height:max-content;position:sticky;top:105px}.filterhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.filterhead b{font:600 20px 'Playfair Display',serif}.clear{border:0;background:none;color:#a8792d;font-size:12px}.filtergroup{border-top:1px solid #eee9df;padding:17px 0}.filterlabel{display:block;font-size:11px;color:#8a7560;font-weight:700;letter-spacing:.08em;margin-bottom:11px}.pills{display:flex;gap:7px;flex-wrap:wrap}.pill{border:1px solid #e3ddd2;background:#fff;border-radius:22px;padding:8px 12px;font-size:12px;color:#526159}.pill.active{background:var(--green);border-color:var(--green);color:#fff}.filters select,.filters input{width:100%;border:1px solid #e1dbd0;background:#fff;border-radius:7px;padding:11px 10px;outline:0;color:#43534b}.range{display:grid;grid-template-columns:1fr 1fr;gap:8px}.roomrow{display:flex;gap:6px}.roomrow button{flex:1;border:1px solid #e2ddd4;background:#fff;border-radius:6px;padding:8px 0;font-size:12px;color:#526159}.roomrow button.active{background:var(--green);color:#fff;border-color:var(--green)}.savebox{background:#fff7e8;border:1px solid #efd9ae;border-radius:9px;padding:14px;margin-top:12px}.savebox b{font-size:13px}.savebox p{font-size:11px;color:#81715a;line-height:1.5;margin:6px 0 0}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.property{background:#fffdfa;border:1px solid var(--line);border-radius:11px;overflow:hidden;transition:.25s;min-width:0}.property:hover{transform:translateY(-4px);box-shadow:0 16px 34px rgba(27,48,38,.1)}.photo{height:205px;position:relative;overflow:hidden;background:#ddd}.photo img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s}.property:hover .photo img{transform:scale(1.04)}.tags{position:absolute;top:13px;left:12px;display:flex;gap:5px}.tag{font-size:10px;font-weight:700;padding:6px 9px;border-radius:20px;background:#fff;color:#34453c}.tag.premium{background:var(--gold);color:#17251f}.tag.recommend{background:var(--green);color:#fff}.heart{position:absolute;right:12px;top:12px;width:34px;height:34px;border:0;border-radius:50%;background:#fffF;color:#33463e;font-size:19px;box-shadow:0 2px 8px #0002}.heart.saved{color:#bd5148}.propertybody{padding:17px 17px 15px}.price{font:600 21px 'Playfair Display',serif;color:var(--green);margin-bottom:7px}.price small{font:500 12px 'DM Sans',sans-serif;color:#7d8982}.propertytitle{font-size:14px;font-weight:700;line-height:1.45;margin:0 0 8px;color:#192b23}.location{font-size:12px;color:#78847d;display:flex;align-items:center;gap:5px}.details{display:flex;gap:12px;flex-wrap:wrap;border-top:1px solid #eee9df;margin-top:14px;padding-top:12px;color:#6e7a73;font-size:11px}.details span{display:flex;gap:4px;align-items:center}.agent{display:flex;align-items:center;justify-content:space-between;margin-top:14px}.agentinfo{display:flex;align-items:center;gap:8px;font-size:11px}.avatar{width:28px;height:28px;border-radius:50%;background:#e5eee6;color:var(--green);display:grid;place-items:center;font-weight:700}.agentinfo small{display:block;color:#89928d;margin-top:2px}.contact{border:0;background:#eaf4ef;color:var(--green);border-radius:6px;padding:9px 11px;font-size:11px;font-weight:700}.empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:#7a867f;background:#fff;border-radius:12px}
+footer{background:#102f28;color:#dce5df;padding:52px 0 24px}.footgrid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:45px}.footbrand svg{width:190px;filter:brightness(0) invert(1)}.footgrid p{color:#aebdb4;line-height:1.7;font-size:13px;max-width:340px}.footgrid h4{color:#e8c47d;font-size:13px;margin:5px 0 17px}.footgrid a{display:block;color:#c7d1cb;text-decoration:none;font-size:13px;margin:11px 0}.copyright{border-top:1px solid #ffffff1c;margin-top:35px;padding-top:20px;color:#94a69c;font-size:11px;display:flex;justify-content:space-between}
+.modalback{position:fixed;inset:0;background:#071b15b8;z-index:50;display:none;align-items:center;justify-content:center;padding:20px}.modalback.show{display:flex}.modal{background:#fffdfa;border-radius:15px;width:min(620px,100%);max-height:90vh;overflow:auto;padding:28px;position:relative}.modal h3{font:600 28px 'Playfair Display',serif;margin:0 0 18px}.close{position:absolute;right:18px;top:16px;border:0;background:#f1eee8;border-radius:50%;width:34px;height:34px;font-size:18px}.modalgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.modal label{font-size:12px;color:#6f7d75;display:block;margin-bottom:5px}.modal input,.modal select,.modal textarea{width:100%;border:1px solid #e2ddd4;border-radius:7px;padding:11px;margin-top:5px;background:white}.modal .full{grid-column:1/-1}.modal .goldbtn{margin-top:17px;width:100%}.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,20px);background:#123d35;color:#fff;padding:13px 20px;border-radius:9px;opacity:0;pointer-events:none;transition:.25s;z-index:80;font-size:13px}.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:1100px){.navlinks{gap:18px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.regiongrid{grid-template-columns:repeat(3,1fr)}.searchbar{grid-template-columns:1.4fr 1fr 1fr auto}}
+@media(max-width:760px){.wrap{width:min(100% - 32px,600px)}header{height:70px}.brand svg{width:160px}.navlinks,.login,.navright .iconbtn{display:none}.mobilemenu{display:block;border:0;background:transparent;font-size:25px;color:var(--green)}.navright{gap:10px}.navright .goldbtn{padding:11px 13px;font-size:12px}.hero{min-height:650px}.hero-content{padding:65px 0 45px}.hero h1{font-size:43px}.hero p{font-size:15px}.searchbar{grid-template-columns:1fr;gap:0;padding:8px}.searchfield{border-right:0;border-bottom:1px solid var(--line);padding:0 12px}.searchbar .searchsubmit{height:48px;justify-content:center;margin-top:8px}.stats{gap:18px;flex-wrap:wrap;margin-top:30px}.stat strong{font-size:25px}.stat span{font-size:11px}.section{padding:52px 0}.regiongrid{grid-template-columns:repeat(2,1fr)}.listingtop{display:block}.listingtools{margin-top:18px;flex-wrap:wrap}.layout{grid-template-columns:1fr}.filters{position:static}.cards{grid-template-columns:1fr}.photo{height:230px}.footgrid{grid-template-columns:1fr 1fr;gap:28px}.copyright{display:block;line-height:2}.modalgrid{grid-template-columns:1fr}.modal .full{grid-column:auto}}
+
+/* MAKONI refined visual system — quiet luxury, glass surfaces, architectural imagery */
+:root{
+ --green:#123d35;--green2:#1b5145;--gold:#c99a43;--gold2:#e4c17b;
+ --ink:#18251f;--muted:#748078;--paper:#f4f3ee;--line:rgba(26,54,43,.09);
+ --white:#fff;--shadow:0 14px 42px rgba(18,48,38,.075);
+}
+body{
+ background:
+  radial-gradient(ellipse at 8% 18%,rgba(209,185,135,.10),transparent 32%),
+  radial-gradient(ellipse at 92% 52%,rgba(31,91,72,.055),transparent 34%),
+  #f5f4ef;
+ letter-spacing:-.012em;
+}
+.wrap{width:min(1500px,calc(100% - 72px))}
+header{
+ background:rgba(255,253,249,.84);
+ backdrop-filter:blur(22px) saturate(150%);
+ -webkit-backdrop-filter:blur(22px) saturate(150%);
+ border-bottom:1px solid rgba(255,255,255,.72);
+ box-shadow:0 5px 24px rgba(22,43,34,.035);
+}
+.navlinks{gap:34px}
+.navlinks a{font-size:14px;color:#34443d}
+.goldbtn{
+ background:linear-gradient(135deg,#d8ad5d,#c99437);
+ border-radius:8px;box-shadow:0 5px 14px rgba(183,132,48,.16);
+}
+.hero{
+ min-height:690px;
+ background:#10251f;
+}
+.hero:before{
+ background-image:
+  linear-gradient(90deg,rgba(4,20,15,.78) 0%,rgba(4,20,15,.49) 48%,rgba(4,20,15,.15) 100%),
+  url('https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=2400&q=92');
+ background-position:center 52%;
+}
+.hero:after{
+ content:"";position:absolute;inset:0;pointer-events:none;
+ background:linear-gradient(0deg,rgba(3,16,12,.38),transparent 40%,rgba(3,16,12,.08));
+}
+.hero-content{z-index:2;padding:88px 0 70px}
+.eyebrow{
+ background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.26);
+ backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+ padding:10px 17px;font-size:11px;letter-spacing:.13em;
+}
+.hero h1{font-size:clamp(44px,5.1vw,72px);letter-spacing:-1.9px}
+.hero p{font-size:16px;color:rgba(255,255,255,.82)}
+.switch{
+ background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.24);
+ backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+}
+.searchbar{
+ max-width:1080px;padding:8px;border-radius:14px;
+ background:rgba(255,255,255,.88);
+ border:1px solid rgba(255,255,255,.75);
+ box-shadow:0 20px 70px rgba(0,0,0,.2);
+ backdrop-filter:blur(24px) saturate(160%);
+ -webkit-backdrop-filter:blur(24px) saturate(160%);
+}
+.searchfield{padding:0 15px}
+.searchfield input,.searchfield select{font-size:13px}
+.searchbar .searchsubmit{border-radius:9px;padding:0 25px}
+.stats{gap:76px;margin-top:38px}
+.stat strong{font-size:29px}
+.section{padding:68px 0}
+.sectionhead{margin-bottom:24px}
+.regiongrid{gap:12px}
+.region{
+ border:1px solid rgba(30,64,50,.07);border-radius:10px;
+ background:rgba(255,255,255,.72);padding:17px 15px;
+ box-shadow:0 4px 16px rgba(25,48,38,.025);
+}
+.region:hover{box-shadow:0 12px 26px rgba(25,48,38,.08);border-color:rgba(201,154,67,.34)}
+.listings{
+ background:linear-gradient(180deg,rgba(238,239,232,.86),rgba(245,244,239,.98));
+ padding:58px 0 86px;
+}
+.listingtop{margin-bottom:22px}
+.listingtop h2{font-size:35px}
+.layout{grid-template-columns:252px minmax(0,1fr);gap:22px}
+.filters{
+ position:sticky;top:100px;padding:19px;
+ background:rgba(255,255,255,.78);
+ border:1px solid rgba(255,255,255,.9);
+ border-radius:12px;
+ box-shadow:0 8px 30px rgba(24,48,37,.045);
+ backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+}
+.filterhead b{font-size:19px}
+.filtergroup{padding:14px 0;border-color:rgba(30,64,50,.075)}
+.filterlabel{font-size:10px;letter-spacing:.11em;color:#7b887f}
+.filters select,.filters input{
+ border:1px solid rgba(30,64,50,.12);border-radius:7px;
+ background:rgba(255,255,255,.86);font-size:12px;padding:10px;
+}
+.pill{padding:7px 10px;font-size:11px;border-color:rgba(30,64,50,.12)}
+.pill.active{background:#17483c;border-color:#17483c}
+.roomrow button{font-size:11px;padding:7px 0;border-color:rgba(30,64,50,.12)}
+.savebox{
+ border:1px solid rgba(201,154,67,.23);
+ background:linear-gradient(135deg,rgba(255,248,231,.94),rgba(255,255,255,.84));
+ border-radius:9px;
+}
+.cards{gap:16px}
+.property{
+ border:1px solid rgba(255,255,255,.92);
+ border-radius:10px;
+ background:rgba(255,255,255,.92);
+ box-shadow:0 5px 20px rgba(20,43,33,.045);
+}
+.property:hover{transform:translateY(-3px);box-shadow:0 16px 34px rgba(20,43,33,.11)}
+.photo{height:190px;background:#d9ded9}
+.photo img{filter:saturate(.94) contrast(1.025)}
+.tags{top:11px;left:11px;gap:5px}
+.tag{font-size:9px;padding:6px 8px;backdrop-filter:blur(8px)}
+.heart{
+ width:32px;height:32px;background:rgba(255,255,255,.88);
+ backdrop-filter:blur(10px);font-size:18px;
+}
+.propertybody{padding:15px 15px 13px}
+.price{font-size:19px;margin-bottom:6px}
+.propertytitle{font-size:13px;line-height:1.5}
+.location{font-size:11px}
+.details{gap:10px;margin-top:12px;padding-top:10px;font-size:10px;border-color:rgba(30,64,50,.08)}
+.agent{margin-top:12px}
+.contact{background:#edf4ef;border:1px solid rgba(18,61,53,.06);border-radius:6px;padding:8px 10px}
+.toolbtn,.sort{border-color:rgba(30,64,50,.12);border-radius:8px;background:rgba(255,255,255,.82);font-size:12px}
+footer{background:linear-gradient(120deg,#102f28,#163e34)}
+.modal{border:1px solid rgba(255,255,255,.8);box-shadow:0 24px 80px rgba(0,0,0,.22)}
+@media(max-width:1100px){
+ .wrap{width:min(100% - 42px,980px)}
+ .layout{grid-template-columns:230px minmax(0,1fr);gap:16px}
+ .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .navlinks{gap:20px}
+}
+@media(max-width:760px){
+ .wrap{width:calc(100% - 30px)}
+ .hero{min-height:650px}
+ .hero-content{padding:70px 0 52px}
+ .hero h1{font-size:42px}
+ .hero p{font-size:14px}
+ .searchbar{grid-template-columns:1fr;border-radius:12px;gap:2px}
+ .searchfield{border-right:0;border-bottom:1px solid var(--line);padding:3px 12px}
+ .searchbar .searchsubmit{min-height:48px;justify-content:center;margin-top:5px}
+ .stats{gap:22px;flex-wrap:wrap}
+ .stat strong{font-size:24px}
+ .layout{grid-template-columns:1fr}
+ .filters{position:static}
+ .cards{grid-template-columns:1fr}
+ .photo{height:230px}
+ .listingtop{align-items:flex-start;gap:15px;flex-direction:column}
+ .listingtools{flex-wrap:wrap}
+ .regiongrid{grid-template-columns:repeat(2,1fr)}
+}
+
+
+/* iOS-inspired Liquid Glass controls — consistent across the whole interface */
+:root{
+ --glass-white:rgba(255,255,255,.20);
+ --glass-border:rgba(255,255,255,.48);
+ --glass-shadow:0 8px 24px rgba(8,35,26,.12),inset 0 1px 0 rgba(255,255,255,.62);
+ --glass-dark:rgba(10,43,34,.48);
+}
+button,a,.pill,.toolbtn,.sort,.contact,.heart,.goldbtn,.searchsubmit,.switch button{
+ -webkit-tap-highlight-color:transparent;
+}
+button{
+ transition:background .22s ease,border-color .22s ease,box-shadow .22s ease,transform .22s ease,color .22s ease;
+}
+button:focus-visible,input:focus-visible,select:focus-visible{
+ outline:3px solid rgba(201,154,67,.36);outline-offset:2px;
+}
+/* Header and navigation feel like a floating translucent iOS toolbar */
+header{
+ background:rgba(250,250,247,.68)!important;
+ border-bottom:1px solid rgba(255,255,255,.72)!important;
+ box-shadow:0 8px 28px rgba(18,48,38,.055)!important;
+ backdrop-filter:blur(30px) saturate(190%)!important;
+ -webkit-backdrop-filter:blur(30px) saturate(190%)!important;
+}
+.navright .iconbtn,.navright .login{
+ min-height:42px;padding:0 13px;border-radius:14px;
+ background:rgba(255,255,255,.42);border:1px solid rgba(255,255,255,.72);
+ box-shadow:inset 0 1px 0 #ffffffa8,0 4px 14px #102d2010;
+ backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+}
+.navright .iconbtn:hover,.navright .login:hover{background:rgba(255,255,255,.76);transform:translateY(-1px)}
+.goldbtn{
+ position:relative;isolation:isolate;overflow:hidden;
+ color:#263126!important;
+ background:linear-gradient(135deg,rgba(244,211,145,.94),rgba(199,146,54,.91))!important;
+ border:1px solid rgba(255,255,255,.54)!important;border-radius:14px!important;
+ box-shadow:0 7px 20px rgba(149,103,29,.18),inset 0 1px 0 rgba(255,255,255,.72)!important;
+ backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+}
+.goldbtn:before,.searchsubmit:before,.toolbtn:before,.contact:before,.pill:before{
+ content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+ background:linear-gradient(135deg,rgba(255,255,255,.40),transparent 52%);
+ opacity:.72;
+}
+.goldbtn:hover{transform:translateY(-2px);box-shadow:0 11px 25px rgba(149,103,29,.24),inset 0 1px 0 #fff!important}
+/* Segmented control inspired by iOS */
+.switch{
+ padding:5px!important;gap:4px;border-radius:18px!important;
+ background:rgba(255,255,255,.16)!important;border:1px solid rgba(255,255,255,.32)!important;
+ box-shadow:inset 0 1px 2px rgba(0,0,0,.10),0 8px 22px rgba(0,0,0,.08);
+ backdrop-filter:blur(28px) saturate(180%)!important;
+ -webkit-backdrop-filter:blur(28px) saturate(180%)!important;
+}
+.switch button{
+ position:relative;border-radius:13px!important;padding:12px 25px!important;
+ background:transparent!important;color:rgba(255,255,255,.9)!important;
+}
+.switch button.active{
+ color:#153c32!important;background:rgba(255,255,255,.92)!important;
+ border:1px solid rgba(255,255,255,.92)!important;
+ box-shadow:0 3px 12px rgba(0,0,0,.14),inset 0 1px 0 #fff!important;
+}
+/* Main search surface: translucent glass, not a flat white rectangle */
+.searchbar{
+ background:rgba(255,255,255,.72)!important;
+ border:1px solid rgba(255,255,255,.82)!important;border-radius:19px!important;
+ box-shadow:0 18px 55px rgba(0,0,0,.19),inset 0 1px 0 rgba(255,255,255,.95)!important;
+ backdrop-filter:blur(30px) saturate(185%)!important;
+ -webkit-backdrop-filter:blur(30px) saturate(185%)!important;
+}
+.searchfield{border-color:rgba(24,57,44,.10)!important}
+.searchfield input,.searchfield select{color:#253d33!important}
+.searchbar .searchsubmit{
+ position:relative;overflow:hidden;border-radius:13px!important;
+ background:linear-gradient(145deg,rgba(29,82,67,.96),rgba(12,55,44,.96))!important;
+ border:1px solid rgba(255,255,255,.36)!important;
+ box-shadow:0 6px 18px rgba(12,55,44,.22),inset 0 1px 0 rgba(255,255,255,.24)!important;
+ backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+}
+.searchbar .searchsubmit:hover{transform:translateY(-1px);box-shadow:0 10px 24px rgba(12,55,44,.3)!important}
+/* Filter chips become soft, tactile glass capsules */
+.pill,.roomrow button{
+ position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.88)!important;
+ background:rgba(255,255,255,.54)!important;color:#41564b!important;
+ border-radius:13px!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 3px 10px rgba(25,55,40,.045)!important;
+ backdrop-filter:blur(14px) saturate(145%);-webkit-backdrop-filter:blur(14px) saturate(145%);
+}
+.pill:hover,.roomrow button:hover{transform:translateY(-1px);background:rgba(255,255,255,.88)!important}
+.pill.active,.roomrow button.active{
+ color:#fff!important;border-color:rgba(255,255,255,.34)!important;
+ background:linear-gradient(145deg,rgba(31,91,73,.96),rgba(15,60,48,.96))!important;
+ box-shadow:0 5px 13px rgba(16,65,51,.18),inset 0 1px 0 rgba(255,255,255,.28)!important;
+}
+/* Native-looking glass inputs and dropdowns */
+.filters select,.filters input,.modal input,.modal select,.modal textarea{
+ background:rgba(255,255,255,.66)!important;
+ border:1px solid rgba(255,255,255,.94)!important;border-radius:12px!important;
+ box-shadow:inset 0 1px 2px rgba(20,48,34,.035),0 3px 12px rgba(20,48,34,.035)!important;
+ backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+}
+.filters select:focus,.filters input:focus,.modal input:focus,.modal select:focus,.modal textarea:focus{
+ border-color:rgba(38,105,82,.38)!important;box-shadow:0 0 0 4px rgba(38,105,82,.09)!important;
+}
+/* Listing toolbar buttons use the same liquid-glass language */
+.toolbtn,.sort{
+ position:relative;overflow:hidden;
+ background:rgba(255,255,255,.58)!important;
+ border:1px solid rgba(255,255,255,.92)!important;border-radius:13px!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 4px 14px rgba(20,48,34,.055)!important;
+ backdrop-filter:blur(18px) saturate(160%)!important;
+ -webkit-backdrop-filter:blur(18px) saturate(160%)!important;
+}
+.toolbtn:hover,.sort:hover{background:rgba(255,255,255,.88)!important;transform:translateY(-1px)}
+.heart{
+ background:rgba(255,255,255,.62)!important;
+ border:1px solid rgba(255,255,255,.88)!important;
+ box-shadow:0 5px 16px rgba(0,0,0,.12),inset 0 1px 0 #ffffff!important;
+ backdrop-filter:blur(18px) saturate(160%)!important;
+ -webkit-backdrop-filter:blur(18px) saturate(160%)!important;
+}
+.heart:hover{transform:scale(1.07);background:rgba(255,255,255,.9)!important}
+.contact{
+ position:relative;overflow:hidden;
+ background:rgba(224,241,231,.70)!important;
+ border:1px solid rgba(255,255,255,.94)!important;border-radius:11px!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 4px 12px rgba(19,70,48,.06)!important;
+ backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+}
+.contact:hover{background:rgba(206,233,216,.92)!important;transform:translateY(-1px)}
+/* More refined, less boxy cards and filter panel */
+.filters{
+ background:rgba(255,255,255,.54)!important;
+ border:1px solid rgba(255,255,255,.88)!important;border-radius:17px!important;
+ box-shadow:0 12px 34px rgba(18,48,38,.055),inset 0 1px 0 rgba(255,255,255,.95)!important;
+ backdrop-filter:blur(24px) saturate(155%)!important;
+ -webkit-backdrop-filter:blur(24px) saturate(155%)!important;
+}
+.property{
+ border:1px solid rgba(255,255,255,.94)!important;border-radius:15px!important;
+ box-shadow:0 8px 24px rgba(20,43,33,.055),inset 0 1px 0 rgba(255,255,255,.95)!important;
+}
+.propertybody{background:rgba(255,255,255,.92)}
+.tag{
+ border:1px solid rgba(255,255,255,.62);
+ box-shadow:0 3px 9px rgba(0,0,0,.08);
+ backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+}
+.savebox{
+ background:rgba(255,248,231,.66)!important;
+ border:1px solid rgba(255,255,255,.88)!important;border-radius:14px!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 5px 16px rgba(130,93,31,.05)!important;
+ backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+}
+.modal{
+ background:rgba(255,255,250,.88)!important;border:1px solid rgba(255,255,255,.95)!important;
+ border-radius:22px!important;box-shadow:0 28px 90px rgba(0,0,0,.24),inset 0 1px 0 #fff!important;
+ backdrop-filter:blur(32px) saturate(160%);-webkit-backdrop-filter:blur(32px) saturate(160%);
+}
+.close{
+ background:rgba(255,255,255,.62)!important;border:1px solid rgba(255,255,255,.9)!important;
+ box-shadow:0 3px 12px rgba(0,0,0,.07),inset 0 1px 0 #fff!important;
+ backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+}
+.toast{
+ border:1px solid rgba(255,255,255,.26);
+ background:rgba(13,55,43,.78)!important;border-radius:16px!important;
+ box-shadow:0 10px 35px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.2)!important;
+ backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+}
+@media(max-width:760px){
+ .navright .goldbtn{border-radius:12px!important}
+ .switch button{padding:11px 19px!important}
+ .toolbtn,.sort{border-radius:12px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+}
+
+
+/* TRUE TRANSLUCENT LENS PASS — visibly see the scene THROUGH the controls */
+:root{
+  --lens-edge:rgba(255,255,255,.58);
+  --lens-fill:rgba(238,248,243,.13);
+  --lens-highlight:rgba(255,255,255,.42);
+}
+header{
+  background:rgba(246,250,247,.48)!important;
+  backdrop-filter:blur(26px) saturate(190%)!important;
+  -webkit-backdrop-filter:blur(26px) saturate(190%)!important;
+}
+header:after{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:-1;
+  background:linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,.035));
+}
+.goldbtn,.navright .goldbtn{
+  color:#fff!important;
+  background:linear-gradient(145deg,rgba(255,255,255,.29),rgba(255,255,255,.10))!important;
+  border:1px solid rgba(255,255,255,.62)!important;
+  box-shadow:inset 0 1.5px 0 rgba(255,255,255,.72),
+             inset 0 -1px 0 rgba(255,255,255,.13),
+             0 7px 24px rgba(0,0,0,.13)!important;
+  backdrop-filter:blur(22px) saturate(210%)!important;
+  -webkit-backdrop-filter:blur(22px) saturate(210%)!important;
+}
+.goldbtn:after,.searchsubmit:after,.toolbtn:after,.sort:after,.contact:after,.heart:after{
+  content:"";position:absolute;inset:1px;border-radius:inherit;pointer-events:none;
+  background:
+   radial-gradient(120% 85% at 15% 0%,rgba(255,255,255,.52),transparent 48%),
+   linear-gradient(155deg,rgba(255,255,255,.18),transparent 42%,rgba(255,255,255,.07));
+  border:1px solid rgba(255,255,255,.18);
+}
+.searchbar{
+  position:relative;overflow:hidden;
+  background:rgba(239,248,243,.20)!important;
+  border:1px solid rgba(255,255,255,.66)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.65),
+             inset 0 -1px 0 rgba(255,255,255,.10),
+             0 18px 55px rgba(0,0,0,.20)!important;
+  backdrop-filter:blur(26px) saturate(220%)!important;
+  -webkit-backdrop-filter:blur(26px) saturate(220%)!important;
+}
+.searchbar:before{
+  content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+  background:linear-gradient(115deg,rgba(255,255,255,.26),rgba(255,255,255,.035) 38%,rgba(255,255,255,.13) 72%,rgba(255,255,255,.20));
+}
+.searchfield{position:relative;z-index:1;border-color:rgba(255,255,255,.22)!important}
+.searchfield input,.searchfield select{color:#fff!important;text-shadow:0 1px 8px rgba(0,0,0,.28)}
+.searchfield input::placeholder{color:rgba(255,255,255,.82)!important}
+.searchfield select option{color:#1b3027}
+.searchfield svg{stroke:#fff!important;filter:drop-shadow(0 1px 3px #0005)}
+.searchbar .searchsubmit{
+ position:relative;z-index:1;overflow:hidden;color:#fff!important;
+ background:linear-gradient(145deg,rgba(255,255,255,.28),rgba(9,48,37,.38))!important;
+ border:1px solid rgba(255,255,255,.62)!important;border-radius:12px!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 5px 18px rgba(0,0,0,.15)!important;
+ backdrop-filter:blur(24px) saturate(220%)!important;
+ -webkit-backdrop-filter:blur(24px) saturate(220%)!important;
+}
+.switch{
+ background:rgba(240,250,245,.12)!important;
+ border:1px solid rgba(255,255,255,.48)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.48),0 8px 25px #0002!important;
+ backdrop-filter:blur(24px) saturate(220%)!important;
+ -webkit-backdrop-filter:blur(24px) saturate(220%)!important;
+}
+.switch button.active{
+ background:rgba(255,255,255,.30)!important;color:#fff!important;
+ border:1px solid rgba(255,255,255,.70)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.82),0 3px 12px #0002!important;
+ backdrop-filter:blur(22px) saturate(220%)!important;
+ -webkit-backdrop-filter:blur(22px) saturate(220%)!important;
+}
+.toolbtn,.sort,.navright .iconbtn,.navright .login,.heart,.contact,.pill,.roomrow button{
+ position:relative;isolation:isolate;overflow:hidden;
+ background:rgba(255,255,255,.22)!important;
+ border:1px solid rgba(255,255,255,.78)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.78),
+            inset 0 -1px 0 rgba(255,255,255,.15),
+            0 5px 18px rgba(25,48,38,.08)!important;
+ backdrop-filter:blur(22px) saturate(200%)!important;
+ -webkit-backdrop-filter:blur(22px) saturate(200%)!important;
+}
+.toolbtn:before,.sort:before,.navright .iconbtn:before,.navright .login:before,
+.heart:before,.contact:before,.pill:before,.roomrow button:before{
+ content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;
+ background:linear-gradient(135deg,rgba(255,255,255,.42),rgba(255,255,255,.025) 48%,rgba(255,255,255,.13));
+}
+.pill.active,.roomrow button.active{
+ background:rgba(18,61,53,.58)!important;color:#fff!important;
+ border-color:rgba(255,255,255,.62)!important;
+ backdrop-filter:blur(24px) saturate(220%)!important;
+ -webkit-backdrop-filter:blur(24px) saturate(220%)!important;
+}
+.heart{background:rgba(255,255,255,.34)!important}
+.contact{
+ color:#fff!important;background:rgba(18,76,57,.32)!important;
+}
+.filters{
+ background:rgba(255,255,255,.43)!important;
+ border:1px solid rgba(255,255,255,.78)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.72),0 12px 34px rgba(18,48,38,.06)!important;
+ backdrop-filter:blur(24px) saturate(175%)!important;
+ -webkit-backdrop-filter:blur(24px) saturate(175%)!important;
+}
+.filters select,.filters input{
+ background:rgba(255,255,255,.28)!important;
+ border:1px solid rgba(255,255,255,.82)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.72),0 3px 12px rgba(20,48,34,.035)!important;
+ backdrop-filter:blur(18px) saturate(190%)!important;
+ -webkit-backdrop-filter:blur(18px) saturate(190%)!important;
+}
+.property{
+ border:1px solid rgba(255,255,255,.88)!important;
+ box-shadow:0 8px 24px rgba(20,43,33,.06),inset 0 1px 0 rgba(255,255,255,.8)!important;
+}
+.tag,.heart{backdrop-filter:blur(18px) saturate(200%)!important;-webkit-backdrop-filter:blur(18px) saturate(200%)!important}
+@supports not ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){
+ .goldbtn,.searchbar,.switch,.toolbtn,.sort,.heart,.contact,.filters{background:rgba(255,255,255,.88)!important}
+}
+
+
+/* MAKONI GLASS 2.0 — consistent optical glass, including sticky scroll state */
+:root{
+ --glass-stroke:rgba(255,255,255,.68);
+ --glass-top:rgba(255,255,255,.34);
+ --glass-mid:rgba(255,255,255,.13);
+ --glass-low:rgba(255,255,255,.07);
+ --glass-dark-stroke:rgba(255,255,255,.38);
+ --glass-shadow:0 10px 30px rgba(8,28,21,.16),inset 0 1px 0 rgba(255,255,255,.68),inset 0 -1px 0 rgba(255,255,255,.10);
+}
+html{scroll-padding-top:92px}
+header{
+ position:sticky!important;top:0!important;z-index:1000!important;
+ isolation:isolate;transform:translateZ(0);
+ background:rgba(245,249,246,.30)!important;
+ border-bottom:1px solid rgba(255,255,255,.48)!important;
+ box-shadow:0 5px 26px rgba(7,29,21,.08),inset 0 1px 0 rgba(255,255,255,.7)!important;
+ backdrop-filter:blur(32px) saturate(220%)!important;
+ -webkit-backdrop-filter:blur(32px) saturate(220%)!important;
+}
+header.scrolled{
+ background:rgba(238,246,241,.23)!important;
+ border-bottom-color:rgba(255,255,255,.54)!important;
+ box-shadow:0 8px 30px rgba(7,29,21,.13),inset 0 1px 0 rgba(255,255,255,.76)!important;
+}
+header:before{
+ content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+ background:linear-gradient(180deg,rgba(255,255,255,.32),rgba(255,255,255,.025) 75%);
+}
+header .nav{position:relative;z-index:1}
+header .navlinks a,header .login,header .iconbtn{color:#173b30!important}
+header .goldbtn{color:#fff!important}
+.glass-control,
+.navright .iconbtn,.navright .login,.goldbtn,.switch,.switch button,
+.searchbar,.searchsubmit,.toolbtn,.sort,.heart,.contact,.pill,
+.roomrow button,.filters select,.filters input,.close{
+ position:relative;isolation:isolate;overflow:hidden;
+}
+.navright .iconbtn,.navright .login,.toolbtn,.sort,.heart,.contact,.pill,.roomrow button,.close{
+ background:linear-gradient(145deg,rgba(255,255,255,.34),rgba(255,255,255,.075))!important;
+ border:1px solid var(--glass-stroke)!important;
+ box-shadow:var(--glass-shadow)!important;
+ backdrop-filter:blur(28px) saturate(220%)!important;
+ -webkit-backdrop-filter:blur(28px) saturate(220%)!important;
+}
+.goldbtn{
+ color:#fff!important;
+ background:linear-gradient(145deg,rgba(225,190,119,.54),rgba(157,111,39,.32))!important;
+ border:1px solid rgba(255,255,255,.62)!important;
+ box-shadow:0 9px 26px rgba(10,30,20,.16),inset 0 1px 0 rgba(255,255,255,.75),inset 0 -1px 0 rgba(255,255,255,.12)!important;
+ backdrop-filter:blur(28px) saturate(220%)!important;
+ -webkit-backdrop-filter:blur(28px) saturate(220%)!important;
+}
+.goldbtn:before,.toolbtn:before,.sort:before,.heart:before,.contact:before,.pill:before,.roomrow button:before,.close:before{
+ content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;
+ background:
+  radial-gradient(125% 95% at 12% 0%,rgba(255,255,255,.52),transparent 48%),
+  linear-gradient(155deg,rgba(255,255,255,.16),transparent 56%,rgba(255,255,255,.09));
+}
+.searchbar{
+ background:linear-gradient(125deg,rgba(255,255,255,.30),rgba(255,255,255,.105))!important;
+ border:1px solid rgba(255,255,255,.72)!important;
+ box-shadow:0 20px 62px rgba(0,0,0,.22),inset 0 1.5px 0 rgba(255,255,255,.78),inset 0 -1px 0 rgba(255,255,255,.12)!important;
+ backdrop-filter:blur(34px) saturate(230%)!important;
+ -webkit-backdrop-filter:blur(34px) saturate(230%)!important;
+}
+.searchbar:after{
+ content:"";position:absolute;inset:1px;border-radius:inherit;pointer-events:none;z-index:0;
+ background:linear-gradient(115deg,rgba(255,255,255,.17),transparent 35%,rgba(255,255,255,.10) 72%,rgba(255,255,255,.20));
+}
+.searchfield{position:relative;z-index:1}
+.searchfield input,.searchfield select{color:#fff!important}
+.searchfield input::placeholder{color:rgba(255,255,255,.88)!important}
+.searchfield select option{color:#19392e}
+.searchsubmit{
+ background:linear-gradient(145deg,rgba(255,255,255,.29),rgba(9,48,37,.34))!important;
+ border:1px solid rgba(255,255,255,.68)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 7px 20px rgba(0,0,0,.16)!important;
+ backdrop-filter:blur(30px) saturate(220%)!important;
+ -webkit-backdrop-filter:blur(30px) saturate(220%)!important;
+}
+.switch{
+ background:rgba(255,255,255,.13)!important;
+ border:1px solid rgba(255,255,255,.50)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 8px 24px rgba(0,0,0,.13)!important;
+ backdrop-filter:blur(30px) saturate(220%)!important;
+ -webkit-backdrop-filter:blur(30px) saturate(220%)!important;
+}
+.switch button{background:transparent!important;border:1px solid transparent!important}
+.switch button.active{
+ background:linear-gradient(145deg,rgba(255,255,255,.52),rgba(255,255,255,.22))!important;
+ color:#fff!important;border:1px solid rgba(255,255,255,.78)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 4px 15px rgba(0,0,0,.14)!important;
+ backdrop-filter:blur(28px) saturate(230%)!important;
+ -webkit-backdrop-filter:blur(28px) saturate(230%)!important;
+}
+.filters select,.filters input{
+ background:linear-gradient(145deg,rgba(255,255,255,.68),rgba(255,255,255,.36))!important;
+ border:1px solid rgba(255,255,255,.96)!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 4px 12px rgba(20,48,34,.04)!important;
+ backdrop-filter:blur(20px) saturate(180%)!important;
+ -webkit-backdrop-filter:blur(20px) saturate(180%)!important;
+}
+.filters{
+ background:rgba(250,252,249,.54)!important;
+ border:1px solid rgba(255,255,255,.88)!important;
+ box-shadow:0 12px 35px rgba(18,48,38,.065),inset 0 1px 0 rgba(255,255,255,.92)!important;
+ backdrop-filter:blur(26px) saturate(175%)!important;
+ -webkit-backdrop-filter:blur(26px) saturate(175%)!important;
+}
+.toolbtn:hover,.sort:hover,.contact:hover,.goldbtn:hover,.navright .login:hover{
+ transform:translateY(-2px);filter:brightness(1.07);
+}
+.heart:hover{transform:scale(1.07)}
+.pill.active,.roomrow button.active{
+ background:linear-gradient(145deg,rgba(23,80,63,.74),rgba(12,54,42,.56))!important;
+ border-color:rgba(255,255,255,.70)!important;color:#fff!important;
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.42),0 5px 15px rgba(13,54,41,.16)!important;
+}
+.contact{color:#174b3b!important}
+.property{overflow:hidden}
+.property .heart{background:rgba(255,255,255,.38)!important}
+@supports not ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){
+ header,.searchbar,.switch,.navright .iconbtn,.navright .login,.goldbtn,.toolbtn,.sort,.heart,.contact,.pill,.filters{background:rgba(255,255,255,.91)!important}
+}
+@media(max-width:760px){
+ header{background:rgba(245,249,246,.48)!important}
+ header.scrolled{background:rgba(238,246,241,.38)!important}
+ .navright .iconbtn,.navright .login,.goldbtn,.toolbtn,.sort{backdrop-filter:blur(24px) saturate(200%)!important;-webkit-backdrop-filter:blur(24px) saturate(200%)!important}
+}
+
+
+/* Navbar: architectural photo visible beneath a translucent glass lens */
+header{
+  position:sticky!important;isolation:isolate!important;overflow:hidden!important;
+  background:rgba(12,38,30,.12)!important;
+  border-bottom:1px solid rgba(255,255,255,.48)!important;
+  box-shadow:0 8px 28px rgba(6,24,17,.14),inset 0 1px 0 rgba(255,255,255,.38)!important;
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+}
+header:before{
+  content:""!important;position:absolute!important;inset:0!important;z-index:-2!important;
+  background:
+   linear-gradient(90deg,rgba(7,30,22,.48),rgba(7,30,22,.18) 55%,rgba(7,30,22,.36)),
+   url("https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=2200&q=90") center 47%/cover no-repeat!important;
+  transform:scale(1.025);
+}
+header:after{
+  content:""!important;position:absolute!important;inset:0!important;z-index:-1!important;pointer-events:none!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.26),rgba(255,255,255,.055) 45%,rgba(255,255,255,.13)),rgba(255,255,255,.10)!important;
+  backdrop-filter:blur(18px) saturate(175%)!important;
+  -webkit-backdrop-filter:blur(18px) saturate(175%)!important;
+  border-bottom:1px solid rgba(255,255,255,.22);
+}
+header.scrolled{background:rgba(12,38,30,.10)!important;box-shadow:0 10px 32px rgba(6,24,17,.18),inset 0 1px 0 rgba(255,255,255,.46)!important}
+header .nav,header .container,header .wrap{position:relative!important;z-index:2!important}
+header .navlinks a,header .login,header .iconbtn,header .brand,header .logo,header .brand-name{
+  color:#fff!important;text-shadow:0 1px 8px rgba(0,0,0,.34)!important;
+}
+header .goldbtn{color:#fff!important}
+@media(max-width:760px){
+ header:before{background-position:center 48%!important}
+ header:after{backdrop-filter:blur(20px) saturate(180%)!important;-webkit-backdrop-filter:blur(20px) saturate(180%)!important}
+}
+
+
+
+/* MAKONI HERO BACKGROUND — full-bleed architectural photography */
+.hero{
+  position:relative;
+  isolation:isolate;
+  min-height: min(760px, calc(100svh - 86px));
+  background:#10251f;
+}
+.hero:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-2;
+  transform:scale(1.025);
+  background-image:
+    linear-gradient(90deg,rgba(5,20,15,.82) 0%,rgba(5,20,15,.58) 42%,rgba(5,20,15,.20) 100%),
+    linear-gradient(0deg,rgba(4,17,13,.42),transparent 48%,rgba(4,17,13,.12)),
+    url('https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=2400&q=92');
+  background-size:cover;
+  background-position:center 56%;
+  background-repeat:no-repeat;
+}
+.hero:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:radial-gradient(ellipse at 50% 42%,transparent 20%,rgba(3,15,11,.20) 100%);
+}
+.hero-content{
+  width:min(1160px,calc(100% - 40px));
+  padding:clamp(76px,9vw,112px) 0 76px;
+  text-shadow:0 2px 18px rgba(0,0,0,.22);
+}
+.hero h1{ text-wrap:balance; }
+.hero p{ text-shadow:0 2px 12px rgba(0,0,0,.32); }
+.hero .eyebrow{
+  box-shadow:0 8px 28px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.25);
+}
+@media(max-width:760px){
+  .hero{min-height:680px;}
+  .hero:before{
+    background-image:
+      linear-gradient(180deg,rgba(5,20,15,.55),rgba(5,20,15,.68)),
+      linear-gradient(0deg,rgba(4,17,13,.32),transparent 55%),
+      url('https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1400&q=88');
+    background-position:58% center;
+  }
+  .hero-content{width:calc(100% - 30px);padding:70px 0 48px;}
+}
+@media(prefers-reduced-motion:no-preference){
+  .hero:before{animation:makoniHeroDrift 24s ease-in-out infinite alternate;}
+  @keyframes makoniHeroDrift{from{transform:scale(1.025)}to{transform:scale(1.075)}}
+}
+
+
+
+/* HERO REFERENCE MATCH — layout and contrast based on the supplied screenshot */
+header{
+  height:110px!important;
+  background:#fffdfa!important;
+  border-bottom:1px solid rgba(22,48,37,.08)!important;
+  box-shadow:0 3px 16px rgba(12,30,22,.045)!important;
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+}
+header:before,header:after{display:none!important}
+header .navlinks a,header .login,header .iconbtn{color:#27372f!important;text-shadow:none!important}
+header .goldbtn{color:#17251f!important;background:#d5a044!important;border:0!important;box-shadow:none!important}
+.hero{
+  min-height:calc(100svh - 110px)!important;
+  display:flex;align-items:center;
+  background:#071b15!important;
+}
+.hero:before{
+  inset:0!important;z-index:-2!important;transform:scale(1.015)!important;
+  background-image:
+    linear-gradient(90deg,rgba(2,15,11,.88) 0%,rgba(3,17,13,.57) 43%,rgba(3,17,13,.23) 100%),
+    linear-gradient(0deg,rgba(1,13,9,.55),rgba(2,14,10,.04) 55%,rgba(2,14,10,.15)),
+    url('https://architizer-prod.imgix.net/media/mediadata/uploads/169471891902322-06-21_439_web.jpg?auto=format&fit=crop&w=2400&q=90')!important;
+  background-size:cover!important;background-position:center 52%!important;background-repeat:no-repeat!important;
+}
+.hero:after{z-index:-1!important;background:linear-gradient(0deg,rgba(0,12,8,.24),transparent 42%)!important}
+.hero-content{
+  width:min(1260px,calc(100% - 48px))!important;
+  padding:clamp(72px,8.2vh,100px) 0 76px!important;
+  text-align:center!important;
+}
+.hero .eyebrow{font-size:14px!important;letter-spacing:.08em!important;padding:10px 20px!important}
+.hero h1{font-size:clamp(48px,5.4vw,82px)!important;line-height:1.12!important;letter-spacing:-1.8px!important;margin:26px 0 20px!important}
+.hero p{font-size:clamp(16px,1.3vw,20px)!important;line-height:1.6!important;max-width:790px!important;margin:0 auto 42px!important;color:rgba(255,255,255,.86)!important}
+.hero .switch{
+  margin-bottom:22px!important;padding:5px!important;gap:4px!important;
+  background:rgba(255,255,255,.20)!important;border:1px solid rgba(255,255,255,.34)!important;
+  border-radius:32px!important;backdrop-filter:blur(14px)!important;-webkit-backdrop-filter:blur(14px)!important;
+}
+.hero .switch button{padding:13px 28px!important;border-radius:28px!important;color:#fff!important;background:transparent!important;border:0!important}
+.hero .switch button.active{background:#fff!important;color:#123d35!important;box-shadow:0 3px 12px #0002!important}
+.hero .searchbar{
+  width:min(1210px,100%)!important;max-width:1210px!important;
+  grid-template-columns:1.7fr 1.1fr 1fr auto!important;
+  background:#fffdfa!important;border:1px solid rgba(255,255,255,.9)!important;
+  border-radius:12px!important;padding:9px!important;overflow:visible!important;
+  box-shadow:0 16px 48px rgba(0,0,0,.24)!important;
+  backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+}
+.hero .searchbar:before,.hero .searchbar:after{display:none!important}
+.hero .searchfield{border-right:1px solid #e9e4da!important;border-bottom:0!important;padding:0 18px!important}
+.hero .searchfield svg{stroke:#17483c!important;filter:none!important}
+.hero .searchfield input,.hero .searchfield select{color:#293a32!important;text-shadow:none!important}
+.hero .searchfield input::placeholder{color:#7b8580!important}
+.hero .searchbar .searchsubmit{
+  background:#123d35!important;color:#fff!important;border:0!important;border-radius:9px!important;
+  min-height:60px!important;padding:0 34px!important;box-shadow:none!important;backdrop-filter:none!important;
+}
+.hero .searchbar .searchsubmit:before,.hero .searchbar .searchsubmit:after{display:none!important}
+.hero .stats{gap:68px!important;margin-top:42px!important}
+.hero .stat strong{font-size:34px!important;color:#edc579!important}
+.hero .stat span{font-size:14px!important;color:rgba(255,255,255,.78)!important}
+@media(max-width:760px){
+ header{height:70px!important}
+ .hero{min-height:calc(100svh - 70px)!important}
+ .hero:before{background-position:58% center!important;background-image:linear-gradient(180deg,rgba(3,17,13,.58),rgba(3,17,13,.72)),url('https://architizer-prod.imgix.net/media/mediadata/uploads/169471891902322-06-21_439_web.jpg?auto=format&fit=crop&w=1400&q=88')!important}
+ .hero-content{width:calc(100% - 30px)!important;padding:62px 0 42px!important}
+ .hero h1{font-size:clamp(39px,10vw,52px)!important;letter-spacing:-1.2px!important}
+ .hero p{font-size:15px!important;margin-bottom:28px!important}
+ .hero .eyebrow{font-size:10px!important;letter-spacing:.05em!important}
+ .hero .searchbar{grid-template-columns:1fr!important;padding:8px!important;gap:0!important}
+ .hero .searchfield{border-right:0!important;border-bottom:1px solid #e9e4da!important;padding:3px 12px!important}
+ .hero .searchbar .searchsubmit{min-height:50px!important;margin-top:8px!important;justify-content:center!important}
+ .hero .stats{gap:18px 28px!important;margin-top:30px!important}
+ .hero .stat strong{font-size:25px!important}
+ .hero .stat span{font-size:11px!important}
+}
+
+</style>
+</head>
+<body>
+<header><div class="wrap nav">
+<a class="brand" href="#top" aria-label="MAKONI bosh sahifa"><svg viewBox="0 0 320 92" xmlns="http://www.w3.org/2000/svg"><path d="M13 72 68 40l54 32V28L68 0 13 32Z" fill="#123d35" opacity=".0"/><path d="M26 70V43L68 17l42 26v27" fill="none" stroke="#123d35" stroke-width="8" stroke-linejoin="round"/><path d="M57 22V8l11-7 11 7v28L68 30Z" fill="#d5a044"/><path d="M68 1v29M57 8l22 14" stroke="#fff" stroke-width="2" opacity=".8"/><path d="M42 70V53l26-16 26 16v17" fill="none" stroke="#123d35" stroke-width="5"/><path d="M58 70V55h20v15" fill="#d5a044"/><path d="M4 79Q68 59 132 79" fill="none" stroke="#d5a044" stroke-width="3"/><text x="132" y="54" font-family="DM Sans,Arial" font-size="38" font-weight="700" fill="#123d35" letter-spacing="-1.5">MAKONI</text><text x="134" y="70" font-family="DM Sans,Arial" font-size="8" letter-spacing="2.1" fill="#52665c">O‘Z MAKONINGIZNI TOPING</text></svg></a>
+<nav class="navlinks"><a href="#listings">Sotib olish</a><a href="#listings" onclick="setDeal('Ijara')">Ijara</a><a href="#regions">Hududlar</a><a href="#premium">Premium</a><a href="#about">Biz haqimizda</a></nav>
+<div class="navright"><button class="iconbtn" onclick="showFavorites()" aria-label="Sevimlilar">♡<span class="count" id="favCount">0</span></button><button class="login" onclick="toast('Kirish bo‘limi keyingi versiyada ulanadi')">Kirish</button><button class="goldbtn" onclick="openAdd()">+ E’lon joylash</button></div><button class="mobilemenu" onclick="toast('Navigatsiya: Sotib olish · Ijara · Hududlar')">☰</button>
+</div></header>
+<main id="top">
+<section class="hero"><div class="hero-content">
+<div class="eyebrow">◇ &nbsp; O‘zbekistonning premium mulk platformasi</div>
+<h1>Orzuingizdagi <span>makonni</span> toping</h1>
+<p>14 ta hududda 28 000 dan ortiq tekshirilgan e’lon — kvartiralar, hovli uylar, villalar va tijorat binolari.</p>
+<div class="switch"><button class="active" id="buyTab" onclick="setDeal('Sotuv')">Sotib olish</button><button id="rentTab" onclick="setDeal('Ijara')">Ijaraga olish</button></div>
+<div class="searchbar">
+<div class="searchfield"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="heroQuery" placeholder="Tuman, ko‘cha yoki kalit so‘z"></div>
+<div class="searchfield"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><select id="heroRegion"><option value="">Barcha hududlar</option><option>Toshkent shahri</option><option>Samarqand</option><option>Buxoro</option><option>Farg‘ona</option><option>Andijon</option><option>Namangan</option><option>Qashqadaryo</option><option>Surxondaryo</option><option>Xorazm</option><option>Navoiy</option><option>Jizzax</option><option>Sirdaryo</option><option>Qoraqalpog‘iston</option></select></div>
+<div class="searchfield"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 11 12 3l9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"/></svg><select id="heroType"><option value="">Mulk turi</option><option>Kvartira</option><option>Hovli uy</option><option>Villa</option><option>Tijorat</option><option>Yer uchastkasi</option></select></div>
+<button class="searchsubmit" onclick="applyHeroSearch()">⌕ &nbsp; Qidirish</button></div>
+<div class="stats"><div class="stat"><strong>28 400+</strong><span>Faol e’lonlar</span></div><div class="stat"><strong>1 250+</strong><span>Agentlar</span></div><div class="stat"><strong>14</strong><span>Hududlar</span></div><div class="stat"><strong>4.9</strong><span>Mijozlar bahosi</span></div></div>
+</div></section>
+<section class="section" id="regions"><div class="wrap"><div class="sectionhead"><div><div class="kicker">Hududlar bo‘yicha</div><h2>O‘zingizga yaqin joydan boshlang</h2><p class="sub">Respublikaning barcha hududlaridagi ko‘chmas mulk takliflari.</p></div><a class="textlink" href="#listings">Barcha hududlar →</a></div>
+<div class="regiongrid"><div class="region" onclick="chooseRegion('Toshkent shahri')"><b>Toshkent shahri</b><span>4 820 ta e’lon</span></div><div class="region" onclick="chooseRegion('Samarqand')"><b>Samarqand</b><span>2 140 ta e’lon</span></div><div class="region" onclick="chooseRegion('Farg‘ona')"><b>Farg‘ona</b><span>1 760 ta e’lon</span></div><div class="region" onclick="chooseRegion('Buxoro')"><b>Buxoro</b><span>1 230 ta e’lon</span></div><div class="region" onclick="chooseRegion('Andijon')"><b>Andijon</b><span>1 080 ta e’lon</span></div><div class="region" onclick="chooseRegion('Namangan')"><b>Namangan</b><span>960 ta e’lon</span></div></div></div></section>
+<section class="listings" id="listings"><div class="wrap">
+<div class="listingtop"><div><div class="kicker">Tanlangan takliflar</div><h2>O‘zbekiston bo‘ylab mulklar</h2><p class="sub" id="resultCount">12 ta e’lon topildi</p></div><div class="listingtools"><button class="toolbtn" onclick="showFavorites()">♡ Sevimlilar (<span id="favCount2">0</span>)</button><select class="sort" id="sortSelect" onchange="renderCards()"><option value="recommended">Tavsiya etilgan</option><option value="cheap">Avval arzonlari</option><option value="expensive">Avval qimmatlari</option></select><button class="toolbtn" onclick="toast('Xarita ko‘rinishi keyingi versiyada ulanadi')">▦ Ro‘yxat</button><button class="toolbtn" onclick="toast('Xarita ko‘rinishi keyingi versiyada ulanadi')">⌖ Xarita</button></div></div>
+<div class="layout"><aside class="filters">
+<div class="filterhead"><b>Filtrlar</b><button class="clear" onclick="resetFilters()">Tozalash</button></div>
+<div class="filtergroup"><span class="filterlabel">BITIM TURI</span><div class="pills"><button class="pill active" data-deal="Barchasi" onclick="filterDeal('Barchasi',this)">Barchasi</button><button class="pill" data-deal="Sotuv" onclick="filterDeal('Sotuv',this)">Sotuv</button><button class="pill" data-deal="Ijara" onclick="filterDeal('Ijara',this)">Ijara</button></div></div>
+<div class="filtergroup"><label class="filterlabel" for="regionFilter">JOYLASHUV</label><select id="regionFilter" onchange="renderCards()"><option value="">Barcha hududlar</option><option>Toshkent shahri</option><option>Samarqand</option><option>Buxoro</option><option>Farg‘ona</option><option>Andijon</option><option>Namangan</option><option>Qashqadaryo</option></select></div>
+<div class="filtergroup"><span class="filterlabel">MULK TURI</span><div class="pills" id="typePills"><button class="pill active" onclick="filterType('',this)">Barchasi</button><button class="pill" onclick="filterType('Kvartira',this)">Kvartira</button><button class="pill" onclick="filterType('Hovli uy',this)">Hovli uy</button><button class="pill" onclick="filterType('Villa',this)">Villa</button><button class="pill" onclick="filterType('Tijorat',this)">Tijorat</button><button class="pill" onclick="filterType('Yer uchastkasi',this)">Yer uchastkasi</button></div></div>
+<div class="filtergroup"><span class="filterlabel">NARX (SO‘M)</span><div class="range"><input id="minPrice" type="number" placeholder="Dan" oninput="renderCards()"><input id="maxPrice" type="number" placeholder="Gacha" oninput="renderCards()"></div></div>
+<div class="filtergroup"><span class="filterlabel">XONALAR</span><div class="roomrow" id="rooms"><button class="active" onclick="setRooms('',this)">Har</button><button onclick="setRooms('1',this)">1+</button><button onclick="setRooms('2',this)">2+</button><button onclick="setRooms('3',this)">3+</button><button onclick="setRooms('4',this)">4+</button></div></div>
+<div class="filtergroup"><span class="filterlabel">MINIMAL MAYDON (M²)</span><input id="minArea" type="number" placeholder="Masalan, 60" oninput="renderCards()"></div>
+<div class="savebox"><b>♧ Qidiruvni saqlang</b><p>Yangi mos e’lonlar joylanganda birinchilardan bo‘lib xabardor bo‘ling.</p></div>
+</aside><div class="cards" id="cards"></div></div>
+</div></section>
+<section class="section" id="premium"><div class="wrap" style="display:flex;align-items:center;justify-content:space-between;gap:30px;flex-wrap:wrap"><div><div class="kicker">MAKONI Premium</div><h2>Mulkingiz ko‘proq e’tiborda bo‘lsin</h2><p class="sub">E’loningizni ajratib ko‘rsating va ko‘proq xaridorlarga yetib boring.</p></div><button class="goldbtn" onclick="toast('Premium xizmatlari tez orada ishga tushadi')">Premium haqida →</button></div></section>
+</main>
+<footer id="about"><div class="wrap"><div class="footgrid"><div class="footbrand"><svg viewBox="0 0 320 92" xmlns="http://www.w3.org/2000/svg"><path d="M26 70V43L68 17l42 26v27" fill="none" stroke="#fff" stroke-width="8"/><path d="M57 22V8l11-7 11 7v28L68 30Z" fill="#d5a044"/><path d="M42 70V53l26-16 26 16v17" fill="none" stroke="#fff" stroke-width="5"/><text x="132" y="54" font-family="Arial" font-size="38" font-weight="700" fill="#fff">MAKONI</text><text x="134" y="70" font-family="Arial" font-size="8" letter-spacing="2" fill="#d5a044">O‘Z MAKONINGIZNI TOPING</text></svg><p>O‘zbekiston bo‘ylab ko‘chmas mulkni topish, sotish va ijaraga berish uchun ishonchli platforma.</p></div><div><h4>Platforma</h4><a href="#listings">Sotib olish</a><a href="#listings">Ijaraga olish</a><a href="#premium">Premium</a></div><div><h4>Hududlar</h4><a href="#regions">Toshkent</a><a href="#regions">Samarqand</a><a href="#regions">Farg‘ona</a></div><div><h4>Yordam</h4><a href="#about">Biz haqimizda</a><a href="mailto:info@makoni.uz">Bog‘lanish</a><a href="#about">Foydalanish shartlari</a></div></div><div class="copyright"><span>© 2026 MAKONI. Barcha huquqlar himoyalangan.</span><span>O‘zbekiston uchun yaratilgan.</span></div></div></footer>
+<div class="modalback" id="addModal" onclick="if(event.target===this)closeAdd()"><div class="modal"><button class="close" onclick="closeAdd()">×</button><h3>E’lon joylashtirish</h3><p class="sub">Mulkingiz haqida qisqacha ma’lumot kiriting.</p><form id="addForm" class="modalgrid"><div><label>E’lon sarlavhasi<input required name="title" placeholder="Masalan, 3 xonali yangi kvartira"></label></div><div><label>Narxi (so‘m)<input required name="price" type="number" placeholder="850000000"></label></div><div><label>Hudud<select name="region"><option>Toshkent shahri</option><option>Samarqand</option><option>Buxoro</option><option>Farg‘ona</option></select></label></div><div><label>Mulk turi<select name="type"><option>Kvartira</option><option>Hovli uy</option><option>Villa</option><option>Tijorat</option></select></label></div><div><label>Bitim turi<select name="deal"><option>Sotuv</option><option>Ijara</option></select></label></div><div><label>Xonalar<input name="rooms" type="number" min="1" value="3"></label></div><div class="full"><label>Rasm URL manzili (ixtiyoriy)<input name="image" placeholder="https://..."></label></div><button class="goldbtn full" type="submit">E’lonni ko‘rib chiqish</button></form></div></div>
+<div class="toast" id="toast"></div>
+<script>
+const properties=[
+{id:1,deal:'Sotuv',type:'Kvartira',price:1850000000,rooms:3,baths:2,area:118,region:'Toshkent shahri',district:'Shayxontohur',title:'Panoramali 3 xonali kvartira, Tashkent City yonida',agent:'Dilnoza Karimova',premium:true,recommend:true,img:'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=85'},
+{id:2,deal:'Sotuv',type:'Kvartira',price:3750000000,rooms:4,baths:3,area:196,region:'Toshkent shahri',district:'Yunusobod',title:'Yangi binoda 4 xonali penthaus',agent:'Makon Estate',premium:true,recommend:true,img:'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=900&q=85'},
+{id:3,deal:'Sotuv',type:'Villa',price:6400000000,rooms:5,baths:4,area:420,region:'Toshkent shahri',district:'Qibray',title:'Zamonaviy villa basseyn va bog‘ bilan',agent:'Akmal Yusupov',premium:true,recommend:false,img:'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=900&q=85'},
+{id:4,deal:'Ijara',type:'Tijorat',price:32000000,rooms:0,baths:2,area:240,region:'Toshkent shahri',district:'Mirzo Ulug‘bek',title:'Biznes markazda A sinf ofis',agent:'Makon Business',premium:true,recommend:false,img:'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=900&q=85'},
+{id:5,deal:'Sotuv',type:'Hovli uy',price:2300000000,rooms:5,baths:3,area:310,region:'Samarqand',district:'Tarixiy markaz',title:'An’anaviy hovli uy, tarixiy markazda',agent:'Zarina Ismoilova',premium:false,recommend:true,img:'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=900&q=85'},
+{id:6,deal:'Sotuv',type:'Tijorat',price:1450000000,rooms:0,baths:1,area:165,region:'Toshkent shahri',district:'Chilonzor',title:'Asosiy ko‘chada savdo do‘koni',agent:'Makon Estate',premium:false,recommend:true,img:'https://images.unsplash.com/photo-1604328698692-f76ea9498e76?auto=format&fit=crop&w=900&q=85'},
+{id:7,deal:'Ijara',type:'Kvartira',price:6500000,rooms:2,baths:1,area:72,region:'Samarqand',district:'Universitet xiyoboni',title:'Yorug‘ va shinam 2 xonali kvartira',agent:'Madina Raximova',premium:false,recommend:false,img:'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=900&q=85'},
+{id:8,deal:'Sotuv',type:'Hovli uy',price:980000000,rooms:4,baths:2,area:220,region:'Farg‘ona',district:'Farg‘ona shahri',title:'Keng hovlili oilaviy uy',agent:'Jasur Aliyev',premium:false,recommend:false,img:'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=900&q=85'},
+{id:9,deal:'Ijara',type:'Kvartira',price:4800000,rooms:1,baths:1,area:48,region:'Toshkent shahri',district:'Yakkasaroy',title:'Markazda ixcham studiya kvartira',agent:'Makon Estate',premium:false,recommend:false,img:'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=900&q=85'},
+{id:10,deal:'Sotuv',type:'Villa',price:4200000000,rooms:6,baths:4,area:360,region:'Buxoro',district:'Buxoro shahri',title:'Zamonaviy hovli va keng ayvon',agent:'Shahzod Nurmatov',premium:true,recommend:false,img:'https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=900&q=85'},
+{id:11,deal:'Sotuv',type:'Yer uchastkasi',price:560000000,rooms:0,baths:0,area:600,region:'Andijon',district:'Andijon tumani',title:'Qurilish uchun qulay yer uchastkasi',agent:'Umidjon Xasanov',premium:false,recommend:false,img:'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=900&q=85'},
+{id:12,deal:'Ijara',type:'Hovli uy',price:9000000,rooms:4,baths:2,area:180,region:'Namangan',district:'Namangan shahri',title:'Oilaviy yashash uchun hovli uy',agent:'Makon Estate',premium:false,recommend:true,img:'https://images.unsplash.com/photo-1600047509782-20d39509f26d?auto=format&fit=crop&w=900&q=85'}
+];
+let deal='Barchasi',type='',rooms='',favorites=new Set(),favoriteOnly=false;
+const fmt=n=>new Intl.NumberFormat('uz-UZ').format(n)+' so‘m';
+function renderCards(){let data=properties.filter(p=>(deal==='Barchasi'||p.deal===deal)&&(!type||p.type===type)&&(!document.getElementById('regionFilter').value||p.region===document.getElementById('regionFilter').value)&&(!rooms||p.rooms>=+rooms)&&(!document.getElementById('minPrice').value||p.price>=+document.getElementById('minPrice').value)&&(!document.getElementById('maxPrice').value||p.price<=+document.getElementById('maxPrice').value)&&(!document.getElementById('minArea').value||p.area>=+document.getElementById('minArea').value)&&(!favoriteOnly||favorites.has(p.id)));
+let sort=document.getElementById('sortSelect').value;if(sort==='cheap')data.sort((a,b)=>a.price-b.price);if(sort==='expensive')data.sort((a,b)=>b.price-a.price);
+document.getElementById('resultCount').textContent=data.length+' ta e’lon topildi';
+document.getElementById('cards').innerHTML=data.length?data.map(p=>`<article class="property"><div class="photo"><img src="${p.img}" alt="${p.title}" loading="lazy"><div class="tags">${p.premium?'<span class="tag premium">♛ Premium</span>':''}${p.recommend?'<span class="tag recommend">Tavsiya</span>':''}<span class="tag">${p.deal}</span></div><button class="heart ${favorites.has(p.id)?'saved':''}" onclick="toggleFav(${p.id})">${favorites.has(p.id)?'♥':'♡'}</button></div><div class="propertybody"><div class="price">${fmt(p.price)} ${p.deal==='Ijara'?'<small>/ oy</small>':''}</div><p class="propertytitle">${p.title}</p><div class="location">⌖ ${p.district}, ${p.region}</div><div class="details">${p.rooms?`<span>▤ ${p.rooms} xona</span>`:''}${p.baths?`<span>◯ ${p.baths} hammom</span>`:''}<span>⌗ ${p.area} m²</span><span>⌂ ${p.type}</span></div><div class="agent"><div class="agentinfo"><span class="avatar">${p.agent[0]}</span><span><b>${p.agent}</b><small>${p.agent.includes('Makon')?'Agent':'Ega'} · 1 kun oldin</small></span></div><button class="contact" onclick="toast('Aloqa uchun: +998 90 000 00 00')">♧ Bog‘lanish</button></div></div></article>`).join(''):'<div class="empty">Bu mezonlar bo‘yicha e’lon topilmadi. Filtrlarni o‘zgartirib ko‘ring.</div>';
+}
+function filterDeal(v,el){deal=v;document.querySelectorAll('[data-deal]').forEach(x=>x.classList.toggle('active',x===el));favoriteOnly=false;renderCards()}
+function filterType(v,el){type=v;document.querySelectorAll('#typePills .pill').forEach(x=>x.classList.toggle('active',x===el));renderCards()}
+function setRooms(v,el){rooms=v;document.querySelectorAll('#rooms button').forEach(x=>x.classList.toggle('active',x===el));renderCards()}
+function setDeal(v){deal=v;document.getElementById('buyTab').classList.toggle('active',v==='Sotuv');document.getElementById('rentTab').classList.toggle('active',v==='Ijara');document.querySelectorAll('[data-deal]').forEach(x=>x.classList.toggle('active',x.dataset.deal===v));renderCards()}
+function applyHeroSearch(){document.getElementById('regionFilter').value=document.getElementById('heroRegion').value;let q=document.getElementById('heroQuery').value.toLowerCase();let t=document.getElementById('heroType').value;type=t;document.querySelectorAll('#typePills .pill').forEach(x=>x.classList.toggle('active',x.textContent.trim()===(t||'Barchasi')));renderCards();if(q){document.querySelectorAll('.property').forEach(card=>{card.style.display=card.innerText.toLowerCase().includes(q)?'':'none'})}document.getElementById('listings').scrollIntoView({behavior:'smooth'})}
+function chooseRegion(v){document.getElementById('regionFilter').value=v;renderCards();document.getElementById('listings').scrollIntoView({behavior:'smooth'})}
+function toggleFav(id){favorites.has(id)?favorites.delete(id):favorites.add(id);document.getElementById('favCount').textContent=favorites.size;document.getElementById('favCount2').textContent=favorites.size;renderCards()}
+function showFavorites(){favoriteOnly=true;renderCards();document.getElementById('listings').scrollIntoView({behavior:'smooth'})}
+function resetFilters(){deal='Barchasi';type='';rooms='';favoriteOnly=false;['regionFilter','minPrice','maxPrice','minArea'].forEach(id=>document.getElementById(id).value='');document.querySelectorAll('[data-deal]').forEach(x=>x.classList.toggle('active',x.dataset.deal==='Barchasi'));document.querySelectorAll('#typePills .pill').forEach((x,i)=>x.classList.toggle('active',i===0));document.querySelectorAll('#rooms button').forEach((x,i)=>x.classList.toggle('active',i===0));renderCards()}
+function openAdd(){document.getElementById('addModal').classList.add('show')}function closeAdd(){document.getElementById('addModal').classList.remove('show')}
+document.getElementById('addForm').addEventListener('submit',e=>{e.preventDefault();let f=new FormData(e.target);properties.unshift({id:Date.now(),deal:f.get('deal'),type:f.get('type'),price:+f.get('price'),rooms:+f.get('rooms'),baths:1,area:100,region:f.get('region'),district:f.get('region'),title:f.get('title'),agent:'Yangi foydalanuvchi',premium:false,recommend:false,img:f.get('image')||'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=85'});closeAdd();e.target.reset();resetFilters();toast('Demo e’lon katalogga qo‘shildi')});
+let toastTimer;function toast(msg){let el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2800)}
+renderCards();
+</script>
+<script>
+(() => {
+  const header = document.querySelector('header');
+  if (!header) return;
+  const updateGlassHeader = () => header.classList.toggle('scrolled', window.scrollY > 12);
+  updateGlassHeader();
+  window.addEventListener('scroll', updateGlassHeader, { passive: true });
+})();
+</script>
+
+</body></html>
