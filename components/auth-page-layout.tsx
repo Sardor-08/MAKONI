@@ -1,6 +1,7 @@
-import Image from 'next/image'
 import type { ReactNode } from 'react'
 import Link from 'next/link'
+import { AuthBottomNav } from '@/components/auth-bottom-nav'
+import { AuthVisualCarousel } from '@/components/auth-visual-carousel'
 
 type AuthPageLayoutProps = {
   children: ReactNode
@@ -30,14 +31,7 @@ export function AuthPageLayout({ children, mode }: AuthPageLayoutProps) {
           {children}
         </section>
         <aside className="auth-visual" aria-labelledby="auth-visual-title">
-          <Image
-            alt="Zamonaviy uy-joy me’morchiligi va yashil hovli"
-            className="auth-visual-image"
-            fill
-            priority
-            sizes="(max-width: 640px) 100vw, 50vw"
-            src="/images/makoni-auth-architecture.png"
-          />
+          <AuthVisualCarousel />
           <div className="auth-visual-brand">
             <Link href="/makoni.html">MAKONI</Link>
             <span>UY-JOY TANLOVI</span>
@@ -50,6 +44,7 @@ export function AuthPageLayout({ children, mode }: AuthPageLayoutProps) {
           <p className="auth-visual-note">Sotuv <span aria-hidden="true">·</span> Ijara <span aria-hidden="true">·</span> Yangi imkoniyatlar</p>
         </aside>
       </div>
+      <AuthBottomNav mode={mode} />
     </main>
   )
 }
