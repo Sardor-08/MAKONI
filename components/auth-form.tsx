@@ -13,12 +13,14 @@ type AuthFormProps = {
 export function AuthForm({ mode, returnTo }: AuthFormProps) {
   const router = useRouter()
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [pending, setPending] = useState(false)
   const isSignUp = mode === 'sign-up'
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setError('')
+    setSuccess('')
     setPending(true)
 
     const formData = new FormData(event.currentTarget)
@@ -32,14 +34,33 @@ export function AuthForm({ mode, returnTo }: AuthFormProps) {
         : await signIn.email({ email, password, callbackURL: returnTo })
 
       if (result.error) {
-        setError('Kiritilgan ma’lumotlarni tekshirib, qayta urinib ko‘ring.')
+        const code = result.error.code?.toLowerCase() ?? ''
+        const message = result.error.message?.toLowerCase() ?? ''
+        const isDuplicate = code.includes('already') || message.includes('already')
+        const isInvalidCredentials =
+          code.includes('invalid') || message.includes('invalid') || message.includes('credential')
+
+        setError(
+          isSignUp && isDuplicate
+            ? 'Bu email bilan akkaunt mavjud. Kirish bo‘limiga o‘ting yoki boshqa emaildan foydalaning.'
+            : !isSignUp && isInvalidCredentials
+              ? 'Email yoki parol mos kelmadi. Ma’lumotlarni tekshiring yoki avval ro‘yxatdan o‘ting.'
+              : 'So‘rov bajarilmadi. Internetni tekshiring va qayta urinib ko‘ring.'
+        )
         return
       }
 
+      setSuccess(
+        isSignUp
+          ? 'Akkaunt yaratildi. Hisobingiz ochilmasa, quyidagi “Davom etish” tugmasini bosing yoki kirish sahifasiga o‘ting.'
+          : 'Kirish muvaffaqiyatli. Sahifa ochilmasa, “Davom etish” tugmasini bosing.'
+      )
       router.push(returnTo)
       router.refresh()
     } catch {
-      setError('Hozir tizimga ulanib bo‘lmadi. Birozdan so‘ng qayta urinib ko‘ring.')
+      setError(
+        'Serverga ulanib bo‘lmadi. Internetni tekshirib qayta urinib ko‘ring; muammo davom etsa, ro‘yxatdan o‘tish yoki kirish bo‘limiga qayting.'
+      )
     } finally {
       setPending(false)
     }
@@ -82,7 +103,22 @@ export function AuthForm({ mode, returnTo }: AuthFormProps) {
           type="password"
         />
       </label>
-      {error && <p className="auth-error" role="alert">{error}</p>}
+      {error && (
+        <div className="auth-feedback auth-error" role="alert">
+          <p>{error}</p>
+          <p className="auth-feedback-help">
+            {isSignUp
+              ? 'Yordam: avval ro‘yxatdan o‘tgan bo‘lsangiz, “Kirish” havolasini tanlang.'
+              : 'Yordam: yangi akkaunt uchun “Ro‘yxatdan o‘tish” havolasini tanlang.'}
+          </p>
+        </div>
+      )}
+      {success && (
+        <div className="auth-feedback auth-success" role="status" aria-live="polite">
+          <p>{success}</p>
+          <Link className="auth-recovery-link" href={returnTo}>Davom etish</Link>
+        </div>
+      )}
       <button className="auth-submit" disabled={pending} type="submit">
         {pending ? 'Tekshirilmoqda…' : isSignUp ? 'Akkaunt yaratish' : 'Kirish'}
       </button>
