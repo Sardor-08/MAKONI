@@ -1,5 +1,6 @@
 import { betterAuth } from 'better-auth'
 import { pool } from '@/lib/db'
+import { sendAuthEmail } from '@/lib/auth-email'
 
 export const auth = betterAuth({
   database: pool,
@@ -12,7 +13,30 @@ export const auth = betterAuth({
         : process.env.V0_RUNTIME_URL),
   emailAndPassword: {
     enabled: true,
-    autoSignIn: true,
+    autoSignIn: false,
+    requireEmailVerification: true,
+    sendResetPassword: async ({ user, url }) => {
+      await sendAuthEmail({
+        recipient: user.email,
+        subject: 'MAKONI parolni tiklash',
+        title: 'Parolni tiklash',
+        description: 'Akkauntingiz uchun yangi parol yaratish havolasini oching.',
+        actionUrl: url,
+      })
+    },
+  },
+  emailVerification: {
+    sendOnSignUp: true,
+    autoSignInAfterVerification: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      await sendAuthEmail({
+        recipient: user.email,
+        subject: 'MAKONI email manzilini tasdiqlash',
+        title: 'Emailingizni tasdiqlang',
+        description: 'Ro‘yxatdan o‘tishni yakunlash uchun email manzilingizni tasdiqlang.',
+        actionUrl: url,
+      })
+    },
   },
   trustedOrigins: [
     ...(process.env.NODE_ENV === 'development'

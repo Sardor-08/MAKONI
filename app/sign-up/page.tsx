@@ -33,7 +33,7 @@ export default async function SignUpPage({
         <Link className="auth-brand" href="/makoni.html">MAKONI</Link>
         <p className="auth-eyebrow">Yangi hisob</p>
         <h1 id="auth-title">Akkaunt yarating</h1>
-        <p className="auth-intro">E’lonlarni joylashtirish uchun ro‘yxatdan o‘ting.</p>
+        <p className="auth-intro">E’lonlarni joylashtirish uchun ro‘yxatdan o‘ting. Akkauntni faollashtirish uchun emailingizni tasdiqlaysiz.</p>
         <AuthForm mode="sign-up" returnTo={destination} />
         <Link className="auth-back" href="/makoni.html">← E’lonlarga qaytish</Link>
       </section>
