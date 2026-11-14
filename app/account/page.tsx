@@ -1,64 +1,37 @@
 import type { Metadata } from 'next'
-import { and, desc, eq } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { SignOutButton } from '@/components/sign-out-button'
+import { AccountDashboard } from '@/components/account-dashboard'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { properties } from '@/lib/db/schema'
+import { properties, user } from '@/lib/db/schema'
 
 export const metadata: Metadata = {
-  title: 'Mening e’lonlarim — MAKONI',
-  description: 'MAKONI akkauntingizdagi ko‘chmas mulk e’lonlari.',
+  title: 'Shaxsiy kabinet — MAKONI',
+  description: 'MAKONI akkauntingiz, profil ma’lumotlari va ko‘chmas mulk e’lonlarini boshqaring.',
 }
-
-const money = new Intl.NumberFormat('uz-UZ')
 
 export default async function AccountPage() {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session?.user) redirect('/sign-in?returnTo=%2Faccount')
 
+  const [profile] = await db
+    .select({ id: user.id, name: user.name, email: user.email, image: user.image })
+    .from(user)
+    .where(eq(user.id, session.user.id))
+    .limit(1)
+
   const listings = await db
     .select()
     .from(properties)
-    .where(and(eq(properties.userId, session.user.id), eq(properties.isPublished, true)))
+    .where(eq(properties.userId, session.user.id))
     .orderBy(desc(properties.createdAt))
-    .limit(50)
 
   return (
-    <main className="account-page">
-      <header className="account-header">
-        <a className="auth-brand" href="/makoni.html">MAKONI</a>
-        <SignOutButton />
-      </header>
-      <section className="account-content" aria-labelledby="account-title">
-        <p className="auth-eyebrow">Shaxsiy kabinet</p>
-        <h1 id="account-title">Salom, {session.user.name}</h1>
-        <p className="auth-intro">{session.user.email}</p>
-        <div className="account-listings-heading">
-          <h2>Mening e’lonlarim</h2>
-          <a className="auth-submit account-add" href="/makoni.html?createListing=1">+ E’lon joylash</a>
-        </div>
-        {listings.length === 0 ? (
-          <div className="account-empty">
-            <h3>Hozircha e’lon yo‘q</h3>
-            <p>Birinchi e’loningizni joylashtiring — u katalogda paydo bo‘ladi.</p>
-          </div>
-        ) : (
-          <div className="account-listings">
-            {listings.map((listing) => (
-              <article className="account-listing" key={listing.id}>
-                <img src={listing.imageUrl} alt="" />
-                <div>
-                  <h3>{listing.title}</h3>
-                  <p>{listing.district}, {listing.region} · {listing.deal}</p>
-                </div>
-                <strong>{money.format(listing.price)} so‘m</strong>
-              </article>
-            ))}
-          </div>
-        )}
-      </section>
-    </main>
+    <AccountDashboard
+      account={profile ?? { id: session.user.id, name: session.user.name, email: session.user.email, image: session.user.image ?? null }}
+      listings={listings}
+    />
   )
 }
