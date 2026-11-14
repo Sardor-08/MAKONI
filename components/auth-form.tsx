@@ -1,9 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { FormEvent, useState } from 'react'
-import { signIn, signUp } from '@/lib/auth-client'
+import { FormEvent, useRef, useState } from 'react'
+import { sendVerificationEmail, signIn, signUp } from '@/lib/auth-client'
 
 type AuthFormProps = {
   mode: 'sign-in' | 'sign-up'
@@ -11,16 +10,19 @@ type AuthFormProps = {
 }
 
 export function AuthForm({ mode, returnTo }: AuthFormProps) {
-  const router = useRouter()
+  const emailRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [pending, setPending] = useState(false)
+  const [verificationPending, setVerificationPending] = useState(false)
+  const [needsVerification, setNeedsVerification] = useState(false)
   const isSignUp = mode === 'sign-up'
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setError('')
     setSuccess('')
+    setNeedsVerification(false)
     setPending(true)
 
     const formData = new FormData(event.currentTarget)
@@ -30,8 +32,13 @@ export function AuthForm({ mode, returnTo }: AuthFormProps) {
 
     try {
       const result = isSignUp
-        ? await signUp.email({ email, password, name, callbackURL: returnTo })
-        : await signIn.email({ email, password, callbackURL: returnTo })
+        ? await signUp.email({
+            email,
+            password,
+            name,
+            callbackURL: `${window.location.origin}${returnTo}`,
+          })
+        : await signIn.email({ email, password })
 
       if (result.error) {
         const code = result.error.code?.toLowerCase() ?? ''
@@ -40,29 +47,56 @@ export function AuthForm({ mode, returnTo }: AuthFormProps) {
         const isInvalidCredentials =
           code.includes('invalid') || message.includes('invalid') || message.includes('credential')
 
+        const isUnverified = code.includes('email_not_verified') || message.includes('not verified')
+        setNeedsVerification(!isSignUp && isUnverified)
         setError(
           isSignUp && isDuplicate
             ? 'Bu email bilan akkaunt mavjud. Kirish bo‘limiga o‘ting yoki boshqa emaildan foydalaning.'
-            : !isSignUp && isInvalidCredentials
-              ? 'Email yoki parol mos kelmadi. Ma’lumotlarni tekshiring yoki avval ro‘yxatdan o‘ting.'
-              : 'So‘rov bajarilmadi. Internetni tekshiring va qayta urinib ko‘ring.'
+            : !isSignUp && isUnverified
+              ? 'Email manzilingiz hali tasdiqlanmagan. Tasdiqlash xatini qayta yuboring.'
+              : !isSignUp && isInvalidCredentials
+                ? 'Email yoki parol mos kelmadi. Ma’lumotlarni tekshiring yoki avval ro‘yxatdan o‘ting.'
+                : 'So‘rov bajarilmadi. Internetni tekshiring va qayta urinib ko‘ring.'
         )
         return
       }
 
       setSuccess(
         isSignUp
-          ? 'Akkaunt yaratildi. Hisobingiz ochilmasa, quyidagi “Davom etish” tugmasini bosing yoki kirish sahifasiga o‘ting.'
-          : 'Kirish muvaffaqiyatli. Sahifa ochilmasa, “Davom etish” tugmasini bosing.'
+          ? 'Akkaunt yaratildi. Kirishni yakunlash uchun emailingizga yuborilgan tasdiqlash havolasini bosing.'
+          : 'Kirish tasdiqlandi. Davom etish tugmasini bosib akkauntingizga o‘ting.'
       )
-      router.push(returnTo)
-      router.refresh()
     } catch {
       setError(
         'Serverga ulanib bo‘lmadi. Internetni tekshirib qayta urinib ko‘ring; muammo davom etsa, ro‘yxatdan o‘tish yoki kirish bo‘limiga qayting.'
       )
     } finally {
       setPending(false)
+    }
+  }
+
+  async function handleResendVerification() {
+    const email = emailRef.current?.value.trim()
+    if (!email) {
+      setError('Avval email manzilingizni kiriting.')
+      emailRef.current?.focus()
+      return
+    }
+
+    setVerificationPending(true)
+    setError('')
+    try {
+      const result = await sendVerificationEmail({
+        email,
+        callbackURL: `${window.location.origin}${returnTo}`,
+      })
+      if (result.error) throw new Error('verification-email-failed')
+      setSuccess('Tasdiqlash xati yuborildi. Emailingizdagi havolani oching.')
+      setNeedsVerification(false)
+    } catch {
+      setError('Xat yuborilmadi. Emailni tekshirib, birozdan keyin qayta urinib ko‘ring.')
+    } finally {
+      setVerificationPending(false)
     }
   }
 
@@ -87,6 +121,7 @@ export function AuthForm({ mode, returnTo }: AuthFormProps) {
           autoComplete="email"
           maxLength={254}
           name="email"
+          ref={emailRef}
           placeholder="you@example.com"
           required
           type="email"
@@ -103,6 +138,11 @@ export function AuthForm({ mode, returnTo }: AuthFormProps) {
           type="password"
         />
       </label>
+      {!isSignUp && (
+        <Link className="auth-recovery-link" href="/forgot-password">
+          Parolni unutdingizmi?
+        </Link>
+      )}
       {error && (
         <div className="auth-feedback auth-error" role="alert">
           <p>{error}</p>
@@ -111,12 +151,22 @@ export function AuthForm({ mode, returnTo }: AuthFormProps) {
               ? 'Yordam: avval ro‘yxatdan o‘tgan bo‘lsangiz, “Kirish” havolasini tanlang.'
               : 'Yordam: yangi akkaunt uchun “Ro‘yxatdan o‘tish” havolasini tanlang.'}
           </p>
+          {needsVerification && (
+            <button
+              className="auth-text-button"
+              disabled={verificationPending}
+              onClick={handleResendVerification}
+              type="button"
+            >
+              {verificationPending ? 'Yuborilmoqda…' : 'Tasdiqlash xatini qayta yuborish'}
+            </button>
+          )}
         </div>
       )}
       {success && (
         <div className="auth-feedback auth-success" role="status" aria-live="polite">
           <p>{success}</p>
-          <Link className="auth-recovery-link" href={returnTo}>Davom etish</Link>
+          {!isSignUp && <Link className="auth-recovery-link" href={returnTo}>Davom etish</Link>}
         </div>
       )}
       <button className="auth-submit" disabled={pending} type="submit">

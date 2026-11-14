@@ -464,6 +464,25 @@ body {
   text-underline-offset: 3px;
 }
 
+.auth-text-button {
+  width: fit-content;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #886124;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.auth-text-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
 .auth-switch {
   margin: 0;
   color: #66736c;
