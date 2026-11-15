@@ -38,6 +38,54 @@ function avatarSource(image: string | null, userId: string) {
   return image?.startsWith('https://') ? image : null
 }
 
+function DashboardWelcome({ firstName }: { firstName: string }) {
+  return (
+    <section className="crm-welcome" id="overview" aria-labelledby="crm-title">
+      <div className="crm-welcome-copy">
+        <p className="crm-eyebrow">SOTUV VA MULK BOSHQARUVI</p>
+        <span className="crm-welcome-kicker"><i aria-hidden="true" /> Shaxsiy kabinetingizga xush kelibsiz</span>
+        <h1 id="crm-title">Xush kelibsiz, <em>{firstName}</em></h1>
+        <p>MAKONI’dagi e’lonlaringiz, mulklaringiz va profilingizni bir joyda boshqaring.</p>
+        <div className="crm-welcome-actions">
+          <Link className="crm-primary-link" href="/list-property"><Plus aria-hidden="true" /> Yangi e’lon joylash</Link>
+          <Link className="crm-quiet-link" href="#listings"><ListChecks aria-hidden="true" /> E’lonlarimga o‘tish</Link>
+        </div>
+      </div>
+      <div className="crm-welcome-art" aria-hidden="true">
+        <img src="/images/makoni-hero-courtyard.png" alt="" />
+        <div className="crm-welcome-art-shade" />
+        <div className="crm-welcome-art-label"><span>MAKONI</span><strong>O‘z makoningiz.</strong></div>
+        <span className="crm-welcome-art-seal"><House /> O‘zbekistonda uy topish</span>
+      </div>
+    </section>
+  )
+}
+
+function PortfolioPulse({ total, published }: { total: number; published: number }) {
+  const activePercent = total ? Math.round((published / total) * 100) : 0
+
+  return (
+    <section className="crm-insight-panel" aria-label="E’lonlar portfeli holati">
+      <div className="crm-insight-copy">
+        <span className="crm-insight-icon"><Eye aria-hidden="true" /></span>
+        <div>
+          <p className="crm-eyebrow">PORTFEL HOLATI</p>
+          <h2>{total ? 'Portfelingiz nazorat ostida' : 'Birinchi makoningizni joylang'}</h2>
+          <p>{total ? `${published} ta e’lon ommaga ko‘rinmoqda, ${total - published} tasi yashirilgan.` : 'E’loningizni joylang va uni shaxsiy kabinetingizdan oson boshqaring.'}</p>
+        </div>
+      </div>
+      <div className="crm-insight-progress">
+        <div className="crm-insight-progress-label"><span>Faol e’lonlar</span><strong>{published} / {total}</strong></div>
+        <div className="crm-progress-bar" role="progressbar" aria-label="Faol e’lonlar ulushi" aria-valuenow={activePercent} aria-valuemin={0} aria-valuemax={100}>
+          <span style={{ width: `${activePercent}%` }} />
+        </div>
+        <span className="crm-insight-caption">{total ? `${activePercent}% portfelingiz ommaga ochiq` : 'Birinchi e’loningizni joylashdan boshlang'}</span>
+      </div>
+      <Link className="crm-insight-link" href={total ? '#listings' : '/list-property'} aria-label={total ? 'E’lonlarimni boshqarish' : 'Birinchi e’lonni joylash'}><ArrowUpRight aria-hidden="true" /></Link>
+    </section>
+  )
+}
+
 export function AccountDashboard({ account, listings }: { account: Account; listings: Listing[] }) {
   const router = useRouter()
   const fileInput = useRef<HTMLInputElement>(null)
@@ -174,14 +222,7 @@ export function AccountDashboard({ account, listings }: { account: Account; list
         </header>
 
         <div className="crm-content">
-          <section className="crm-welcome" id="overview" aria-labelledby="crm-title">
-            <div>
-              <p className="crm-eyebrow">SOTUV VA MULK BOSHQARUVI</p>
-              <h1 id="crm-title">Xush kelibsiz, {account.name.split(' ')[0]}</h1>
-              <p>Shaxsiy e’lonlaringiz va akkauntingizni shu yerdan boshqaring.</p>
-            </div>
-            <Link className="crm-primary-link" href="/list-property"><Plus aria-hidden="true" /> Yangi e’lon joylash</Link>
-          </section>
+          <DashboardWelcome firstName={account.name.split(' ')[0]} />
 
           <section className="crm-stats" aria-label="E’lonlar hisoboti">
             <article className="crm-stat-card"><span className="crm-stat-icon"><ListChecks aria-hidden="true" /></span><div><p>Jami e’lonlar</p><strong>{listings.length}</strong><small>Akkauntingizdagi barcha e’lonlar</small></div></article>
@@ -189,6 +230,8 @@ export function AccountDashboard({ account, listings }: { account: Account; list
             <article className="crm-stat-card"><span className="crm-stat-icon crm-stat-icon-muted"><EyeOff aria-hidden="true" /></span><div><p>Yashirilgan</p><strong>{hiddenCount}</strong><small>Faqat sizga ko‘rinadi</small></div></article>
             <article className="crm-stat-card"><span className="crm-stat-icon crm-stat-icon-gold"><House aria-hidden="true" /></span><div><p>Jami e’lon qiymati</p><strong className="crm-stat-value">{money.format(listedValue)}</strong><small>So‘m, barcha e’lonlar bo‘yicha</small></div></article>
           </section>
+
+          <PortfolioPulse total={listings.length} published={publishedCount} />
 
           <section className="crm-listings-panel" id="listings" aria-labelledby="listings-title">
             <div className="crm-section-heading">
