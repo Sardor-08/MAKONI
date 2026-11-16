@@ -10,30 +10,31 @@ type RecoveryFormProps = {
 }
 
 export function PasswordRecoveryForm({ mode, token }: RecoveryFormProps) {
+  const [email, setEmail] = useState('')
+  const [newPassword, setNewPassword] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [pending, setPending] = useState(false)
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    if (pending) return
     setError('')
     setSuccess('')
     setPending(true)
 
-    const formData = new FormData(event.currentTarget)
     try {
       if (mode === 'request') {
-        const email = String(formData.get('email') ?? '').trim()
         const result = await requestPasswordReset({
-          email,
+          email: email.trim(),
           redirectTo: `${window.location.origin}/reset-password`,
         })
         if (result.error) throw new Error('request-failed')
         setSuccess('Agar email akkauntga tegishli bo‘lsa, parolni tiklash havolasini yubordik. Kiruvchi xatlar va spam papkasini tekshiring.')
       } else {
-        const password = String(formData.get('password') ?? '')
-        const result = await resetPassword({ newPassword: password, token: token ?? '' })
+        const result = await resetPassword({ newPassword, token: token ?? '' })
         if (result.error) throw new Error('reset-failed')
+        setNewPassword('')
         setSuccess('Parolingiz yangilandi. Endi yangi parol bilan tizimga kiring.')
       }
     } catch {
@@ -57,16 +58,36 @@ export function PasswordRecoveryForm({ mode, token }: RecoveryFormProps) {
   }
 
   return (
-    <form className="auth-form" onSubmit={handleSubmit}>
+    <form className="auth-form" aria-busy={pending} onSubmit={handleSubmit}>
       {mode === 'request' ? (
         <label className="auth-field">
           Email
-          <input autoComplete="email" maxLength={254} name="email" placeholder="you@example.com" required type="email" />
+          <input
+            autoComplete="email"
+            maxLength={254}
+            name="email"
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="you@example.com"
+            required
+            type="email"
+            value={email}
+            disabled={pending}
+          />
         </label>
       ) : (
         <label className="auth-field">
           Yangi parol
-          <input autoComplete="new-password" minLength={8} name="password" placeholder="Kamida 8 ta belgi" required type="password" />
+          <input
+            autoComplete="new-password"
+            minLength={8}
+            name="password"
+            onChange={(event) => setNewPassword(event.target.value)}
+            placeholder="Kamida 8 ta belgi"
+            required
+            type="password"
+            value={newPassword}
+            disabled={pending}
+          />
         </label>
       )}
       {error && <p className="auth-feedback auth-error" role="alert">{error}</p>}
@@ -76,9 +97,15 @@ export function PasswordRecoveryForm({ mode, token }: RecoveryFormProps) {
           {mode === 'reset' && <Link className="auth-recovery-link" href="/sign-in">Kirish sahifasiga o‘tish</Link>}
         </div>
       )}
+      {pending && (
+        <div className="auth-pending" role="status" aria-live="polite">
+          <span className="auth-spinner" aria-hidden="true" />
+          <p>{mode === 'request' ? 'Tiklash havolasi emailingizga yuborilmoqda…' : 'Yangi parol saqlanmoqda…'}</p>
+        </div>
+      )}
       {!success && (
         <button className="auth-submit" disabled={pending} type="submit">
-          {pending ? 'Bajarilmoqda…' : mode === 'request' ? 'Tiklash havolasini yuborish' : 'Parolni yangilash'}
+          {pending ? 'Yuborilmoqda…' : mode === 'request' ? 'Tiklash havolasini yuborish' : 'Parolni yangilash'}
         </button>
       )}
       <p className="auth-switch"><Link href="/sign-in">Kirish sahifasiga qaytish</Link></p>
