@@ -8,6 +8,7 @@ import {
   timestamp,
   unique,
   bigint,
+  jsonb,
 } from 'drizzle-orm/pg-core'
 
 export const user = pgTable('user', {
@@ -60,6 +61,8 @@ export const verification = pgTable('verification', {
   updatedAt: timestamp('updatedAt').defaultNow(),
 })
 
+export { auditLogs, listingPlans, paymentSettings, paymentSubmissions } from './marketplace-schema'
+
 export const properties = pgTable(
   'properties',
   {
@@ -78,6 +81,9 @@ export const properties = pgTable(
     premium: boolean('premium').notNull().default(false),
     recommend: boolean('recommend').notNull().default(false),
     imageUrl: text('imageUrl').notNull(),
+    imageUrls: jsonb('imageUrls').$type<string[]>().notNull().default([]),
+    planId: text('planId'),
+    expiresAt: timestamp('expiresAt', { withTimezone: true }),
     isPublished: boolean('isPublished').notNull().default(true),
     createdAt: timestamp('createdAt').notNull().defaultNow(),
   },

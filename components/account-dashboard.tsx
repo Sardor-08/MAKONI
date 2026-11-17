@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import Link from 'next/link'
+import { upload } from '@vercel/blob/client'
 import { useRouter } from 'next/navigation'
 import { ArrowUpRight, Camera, Check, ChevronRight, CircleUserRound, Eye, EyeOff, House, LayoutDashboard, ListChecks, Plus, Search, Trash2, UserRound } from 'lucide-react'
 import { deleteListing, saveProfile, setListingPublished } from '@/app/actions/account'
@@ -20,6 +21,11 @@ type Listing = {
   district: string
   imageUrl: string
   isPublished: boolean
+  planId: string | null
+  expiresAt: Date | null
+  isExpired: boolean
+  paymentStatus: string | null
+  reviewNote: string | null
   createdAt: Date
 }
 
@@ -103,13 +109,14 @@ export function AccountDashboard({ account, listings }: { account: Account; list
   const visibleListings = useMemo(() => {
     const query = search.trim().toLocaleLowerCase('uz-UZ')
     return listings.filter((listing) => {
-      const matchesStatus = filter === 'all' || (filter === 'published' ? listing.isPublished : !listing.isPublished)
+      const isEffectivelyPublished = listing.isPublished && !listing.isExpired
+      const matchesStatus = filter === 'all' || (filter === 'published' ? isEffectivelyPublished : !isEffectivelyPublished)
       const matchesSearch = !query || `${listing.title} ${listing.region} ${listing.district} ${listing.propertyType}`.toLocaleLowerCase('uz-UZ').includes(query)
       return matchesStatus && matchesSearch
     })
   }, [filter, listings, search])
 
-  const publishedCount = listings.filter((listing) => listing.isPublished).length
+  const publishedCount = listings.filter((listing) => listing.isPublished && !listing.isExpired).length
   const hiddenCount = listings.length - publishedCount
   const listedValue = listings.reduce((total, listing) => total + listing.price, 0)
   const avatar = avatarSource(image, account.id)
@@ -138,18 +145,42 @@ export function AccountDashboard({ account, listings }: { account: Account; list
     setUploading(true)
     setProfileMessage('')
     setProfileError('')
+    let uploadedPath: string | null = null
     try {
-      const formData = new FormData()
-      formData.set('file', file)
-      const response = await fetch('/api/profile-image', { method: 'POST', body: formData })
-      const result = await response.json()
-      if (!response.ok || typeof result.pathname !== 'string') throw new Error('Upload failed')
-      const saved = await saveProfile(name, result.pathname)
+      const extensions: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' }
+      const extension = extensions[file.type]
+      if (!extension || file.size > 5 * 1024 * 1024) throw new Error('Invalid image')
+
+      const blob = await upload(`profiles/${account.id}/${crypto.randomUUID()}.${extension}`, file, {
+        access: 'private',
+        handleUploadUrl: '/api/private-uploads',
+      })
+      uploadedPath = blob.pathname
+      const saved = await saveProfile(name, uploadedPath)
       if (!saved.ok) throw new Error('Profile update failed')
-      setImage(result.pathname)
+
+      const previousImage = image
+      setImage(uploadedPath)
       setProfileMessage('Profil rasmi yangilandi.')
       router.refresh()
+      if (previousImage?.startsWith(`profiles/${account.id}/`)) {
+        await fetch('/api/private-uploads', {
+          method: 'DELETE',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paths: [previousImage] }),
+        }).catch(() => undefined)
+      }
+      uploadedPath = null
     } catch {
+      if (uploadedPath) {
+        await fetch('/api/private-uploads', {
+          method: 'DELETE',
+          credentials: 'same-origin',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paths: [uploadedPath] }),
+        }).catch(() => undefined)
+      }
       setProfileError('Rasm yuklanmadi. JPG, PNG yoki WebP formatida 5 MB gacha rasm tanlang.')
     } finally {
       setUploading(false)
@@ -258,15 +289,16 @@ export function AccountDashboard({ account, listings }: { account: Account; list
                   <article className="crm-listing-row" key={listing.id}>
                     <img className="crm-listing-image" src={listing.imageUrl} alt={`${listing.title} mulk rasmi`} />
                     <div className="crm-listing-info">
-                      <div className="crm-listing-title-line"><h3>{listing.title}</h3><span className={listing.isPublished ? 'crm-status is-published' : 'crm-status is-hidden'}><i aria-hidden="true" />{listing.isPublished ? 'Saytda faol' : 'Yashirilgan'}</span></div>
+                      <div className="crm-listing-title-line"><h3>{listing.title}</h3><span className={listing.isExpired ? 'crm-status is-rejected' : listing.isPublished ? 'crm-status is-published' : listing.paymentStatus === 'pending' ? 'crm-status is-pending' : listing.paymentStatus === 'rejected' ? 'crm-status is-rejected' : 'crm-status is-hidden'}><i aria-hidden="true" />{listing.isExpired ? 'Muddati tugagan' : listing.isPublished ? 'Saytda faol' : listing.paymentStatus === 'pending' ? 'To‘lov tekshirilmoqda' : listing.paymentStatus === 'rejected' ? 'To‘lov rad etildi' : 'Yashirin'}</span></div>
                       <p>{listing.propertyType} <span aria-hidden="true">·</span> {listing.deal} <span aria-hidden="true">·</span> {listing.region}, {listing.district}</p>
-                      <div className="crm-listing-meta"><span>{listing.rooms} xona</span><span>{money.format(listing.areaM2)} m²</span><span>{dateFormat.format(new Date(listing.createdAt))}</span></div>
+                      <div className="crm-listing-meta"><span>{listing.rooms} xona</span><span>{money.format(listing.areaM2)} m²</span><span>{dateFormat.format(new Date(listing.createdAt))}</span>{listing.expiresAt && <span>Amal qiladi: {dateFormat.format(new Date(listing.expiresAt))}</span>}</div>{listing.paymentStatus === 'rejected' && listing.reviewNote && <p className="crm-payment-note">Admin izohi: {listing.reviewNote}</p>}
                     </div>
                     <strong className="crm-listing-price">{money.format(listing.price)} <small>so‘m</small></strong>
                     <div className="crm-listing-actions">
-                      <button className="crm-icon-action" disabled={busyListing === listing.id} onClick={() => void handleVisibility(listing)} type="button" aria-label={listing.isPublished ? 'E’lonni saytdan yashirish' : 'E’lonni saytga chiqarish'} title={listing.isPublished ? 'Yashirish' : 'Saytga chiqarish'}>
+                      {listing.isExpired ? <Link className="crm-payment-link" href="/list-property">Yangi tarif</Link> : !listing.isPublished && listing.paymentStatus !== 'pending' && <Link className="crm-payment-link" href={`/list-property?property=${listing.id}`}>{listing.paymentStatus === 'rejected' ? 'Qayta yuborish' : 'To‘lov'}</Link>}
+                      {!listing.isExpired && <button className="crm-icon-action" disabled={busyListing === listing.id} onClick={() => void handleVisibility(listing)} type="button" aria-label={listing.isPublished ? 'E’lonni saytdan yashirish' : 'E’lonni saytga chiqarish'} title={listing.isPublished ? 'Yashirish' : 'Saytga chiqarish'}>
                         {listing.isPublished ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
-                      </button>
+                      </button>}
                       <button className="crm-icon-action is-danger" disabled={busyListing === listing.id} onClick={() => void handleDelete(listing)} type="button" aria-label="E’lonni o‘chirish" title="O‘chirish"><Trash2 aria-hidden="true" /></button>
                     </div>
                   </article>

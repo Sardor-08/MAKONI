@@ -5,32 +5,62 @@ import { redirect } from 'next/navigation'
 import { AccountDashboard } from '@/components/account-dashboard'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { properties, user } from '@/lib/db/schema'
+import { paymentSubmissions, properties, user } from '@/lib/db/schema'
+import { propertyImageSource } from '@/lib/image-path'
 
 export const metadata: Metadata = {
   title: 'Shaxsiy kabinet — MAKONI',
-  description: 'MAKONI akkauntingiz, profil ma’lumotlari va ko‘chmas mulk e’lonlarini boshqaring.',
+  description: 'MAKONI akkauntingiz, profil ma’lumotlari, e’lonlaringiz va to‘lov holatini boshqaring.',
 }
+
+export const dynamic = 'force-dynamic'
 
 export default async function AccountPage() {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session?.user) redirect('/sign-in?returnTo=%2Faccount')
 
-  const [profile] = await db
-    .select({ id: user.id, name: user.name, email: user.email, image: user.image })
-    .from(user)
-    .where(eq(user.id, session.user.id))
-    .limit(1)
+  const [profileRows, listingRows, paymentRows] = await Promise.all([
+    db.select({ id: user.id, name: user.name, email: user.email, image: user.image })
+      .from(user).where(eq(user.id, session.user.id)).limit(1),
+    db.select({
+      id: properties.id,
+      title: properties.title,
+      deal: properties.deal,
+      propertyType: properties.propertyType,
+      price: properties.price,
+      rooms: properties.rooms,
+      baths: properties.baths,
+      areaM2: properties.areaM2,
+      region: properties.region,
+      district: properties.district,
+      imageUrl: properties.imageUrl,
+      isPublished: properties.isPublished,
+      planId: properties.planId,
+      expiresAt: properties.expiresAt,
+      createdAt: properties.createdAt,
+    })
+      .from(properties).where(eq(properties.userId, session.user.id)).orderBy(desc(properties.createdAt)),
+    db.select({ propertyId: paymentSubmissions.propertyId, status: paymentSubmissions.status, reviewNote: paymentSubmissions.reviewNote })
+      .from(paymentSubmissions).where(eq(paymentSubmissions.userId, session.user.id)).orderBy(desc(paymentSubmissions.createdAt)),
+  ])
 
-  const listings = await db
-    .select()
-    .from(properties)
-    .where(eq(properties.userId, session.user.id))
-    .orderBy(desc(properties.createdAt))
+  const latestPayment = new Map<number, { status: string; reviewNote: string | null }>()
+  for (const payment of paymentRows) {
+    if (!latestPayment.has(payment.propertyId)) latestPayment.set(payment.propertyId, payment)
+  }
+
+  const now = Date.now()
+  const listings = listingRows.map((listing) => ({
+    ...listing,
+    isExpired: Boolean(listing.expiresAt && listing.expiresAt.getTime() <= now),
+    imageUrl: propertyImageSource(listing.imageUrl),
+    paymentStatus: latestPayment.get(listing.id)?.status ?? null,
+    reviewNote: latestPayment.get(listing.id)?.reviewNote ?? null,
+  }))
 
   return (
     <AccountDashboard
-      account={profile ?? { id: session.user.id, name: session.user.name, email: session.user.email, image: session.user.image ?? null }}
+      account={profileRows[0] ?? { id: session.user.id, name: session.user.name, email: session.user.email, image: session.user.image ?? null }}
       listings={listings}
     />
   )
