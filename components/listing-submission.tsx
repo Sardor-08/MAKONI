@@ -17,8 +17,8 @@ type ListingPlan = {
   premium: boolean
   featured: boolean
 }
-type PaymentSettings = { bankName: string; cardNumber: string; cardHolder: string; instructions: string }
-type ResumeListing = { id: number; title: string; planId: string; paymentStatus: string | null; reviewNote: string | null }
+type PaymentSettings = { bankName: string; cardNumber: string; cardHolder: string; telegramUsername: string; instructions: string }
+type ResumeListing = { id: number; title: string; planId: string; paymentStatus: string | null; reviewNote: string | null; paymentSubmissionId: string | null; paymentAmount: number | null }
 type ListingDraft = {
   title: string
   deal: 'Sotuv' | 'Ijara'
@@ -45,9 +45,51 @@ function ListingForm({ plans, paymentSettings, resumeListing, userId }: ListingF
     resumeListing?.paymentStatus === 'pending' ? 'sent' : resumeListing ? 'payment' : 'details',
   )
   const [error, setError] = useState('')
+  const [shareFeedback, setShareFeedback] = useState('')
   const [pending, setPending] = useState(false)
+  const [submittedPayment, setSubmittedPayment] = useState<{ id: string; amount: number; receiptFile: File } | null>(null)
   const selectedPlan = plans.find((plan) => plan.id === planId)
   const availablePlans = plans.filter((plan) => plan.isActive)
+  const paymentSubmissionId = submittedPayment?.id ?? resumeListing?.paymentSubmissionId ?? null
+  const paymentAmount = submittedPayment?.amount ?? resumeListing?.paymentAmount ?? 0
+  const telegramMessage = paymentSubmissionId
+    ? [
+        'MAKONI to‘lov arizasi',
+        `Foydalanuvchi ID: ${userId}`,
+        `Ariza ID: ${paymentSubmissionId}`,
+        `E’lon ID: ${propertyId ?? resumeListing?.id ?? ''}`,
+        `Miqdor: ${money.format(paymentAmount)} so‘m`,
+        'To‘lov chekini ilova qiling.',
+      ].join('\n')
+    : ''
+  const telegramUrl = paymentSettings.telegramUsername
+    ? `https://t.me/${encodeURIComponent(paymentSettings.telegramUsername.replace(/^@/, ''))}?text=${encodeURIComponent(telegramMessage)}`
+    : `https://t.me/share/url?text=${encodeURIComponent(telegramMessage)}`
+
+  async function handleTelegramShare() {
+    if (!telegramMessage) return
+    const receiptFile = submittedPayment?.receiptFile
+    if (receiptFile && typeof navigator.share === 'function' && navigator.canShare?.({ files: [receiptFile] })) {
+      try {
+        await navigator.share({ title: 'MAKONI to‘lov arizasi', text: telegramMessage, files: [receiptFile] })
+      } catch (shareError) {
+        if (!(shareError instanceof DOMException && shareError.name === 'AbortError')) {
+          setShareFeedback('Ulashish oynasi ochilmadi. Telegram havolasini yoki nusxalash tugmasini sinab ko‘ring.')
+        }
+      }
+      return
+    }
+    window.open(telegramUrl, '_blank', 'noopener,noreferrer')
+  }
+
+  async function handleCopyTelegramMessage() {
+    try {
+      await navigator.clipboard.writeText(telegramMessage)
+      setShareFeedback('Tayyor xabar nusxalandi.')
+    } catch {
+      setShareFeedback('Xabarni nusxalab bo‘lmadi. Matnni qo‘lda belgilang.')
+    }
+  }
 
   async function cleanupUploads(paths: string[]) {
     if (paths.length === 0) return
@@ -169,7 +211,8 @@ function ListingForm({ plans, paymentSettings, resumeListing, userId }: ListingF
         return
       }
       const result = await response.json()
-      if (!response.ok) throw new Error(result.error || 'To‘lov arizasini yuborib bo‘lmadi.')
+      if (!response.ok || !result.submission?.id) throw new Error(result.error || 'To‘lov arizasini yuborib bo‘lmadi.')
+      setSubmittedPayment({ id: result.submission.id, amount: Number(result.submission.amount), receiptFile: receipt })
       receiptPath = null
       setStep('sent')
       router.refresh()
@@ -187,7 +230,17 @@ function ListingForm({ plans, paymentSettings, resumeListing, userId }: ListingF
         <span className="listing-success-icon"><Clock3 aria-hidden="true" /></span>
         <p className="listing-kicker">TO‘LOV ARIZASI YUBORILDI</p>
         <h2 id="listing-sent-title">E’lon tekshiruvdan so‘ng faollashadi</h2>
-        <p>Admin chekni ko‘rib chiqadi. Tasdiqlangach, e’lon tanlangan tarif muddati davomida MAKONI’da ko‘rinadi.</p>
+        <p>Ariza bazada saqlandi va admin ko‘rib chiqmaguncha yo‘qolmaydi. Tasdiqlangach, e’lon tanlangan tarif muddati davomida MAKONI’da ko‘rinadi.</p>
+        {telegramMessage && <section className="listing-telegram-handoff" aria-labelledby="telegram-handoff-title">
+          <h3 id="telegram-handoff-title">Telegram uchun tayyor xabar</h3>
+          <pre>{telegramMessage}</pre>
+          <p>{paymentSettings.telegramUsername ? `Xabar @${paymentSettings.telegramUsername.replace(/^@/, '')} akkauntiga tayyorlanadi.` : 'Telegram ulashish oynasida admin akkauntini tanlang.'} Chek ham ulashish qo‘llansa birga boradi, aks holda Telegram’da qo‘lda biriktiring.</p>
+          <div className="listing-success-actions">
+            <button className="listing-primary" onClick={() => void handleTelegramShare()} type="button">Telegram’da yuborish</button>
+            <button className="listing-secondary" onClick={() => void handleCopyTelegramMessage()} type="button">Xabarni nusxalash</button>
+          </div>
+          {shareFeedback && <p className="listing-share-feedback" role="status">{shareFeedback}</p>}
+        </section>}
         <div className="listing-success-actions">
           <Link className="listing-primary" href="/account">Shaxsiy kabinetga o‘tish</Link>
           <Link className="listing-secondary" href="/makoni.html">E’lonlarni ko‘rish</Link>
@@ -202,7 +255,17 @@ function ListingForm({ plans, paymentSettings, resumeListing, userId }: ListingF
         <span className="listing-success-icon"><Clock3 aria-hidden="true" /></span>
         <p className="listing-kicker">ARIZA TEKSHIRILMOQDA</p>
         <h2 id="listing-pending-title">“{resumeListing.title}” uchun to‘lov qabul qilindi</h2>
-        <p>Takroriy ariza yuborish shart emas. Tekshiruv yakunlangach e’lon avtomatik faollashtiriladi.</p>
+        <p>Arizangiz va ID raqami bazada saqlanadi. Takroriy ariza yuborish shart emas; quyidagi tayyor xabarni qayta yuborishingiz mumkin.</p>
+        {telegramMessage && <section className="listing-telegram-handoff" aria-labelledby="telegram-pending-title">
+          <h3 id="telegram-pending-title">Telegram uchun tayyor xabar</h3>
+          <pre>{telegramMessage}</pre>
+          <p>{paymentSettings.telegramUsername ? `Xabar @${paymentSettings.telegramUsername.replace(/^@/, '')} akkauntiga tayyorlanadi.` : 'Telegram ulashish oynasida admin akkauntini tanlang.'} Chekni Telegram’da qo‘lda biriktiring.</p>
+          <div className="listing-success-actions">
+            <button className="listing-primary" onClick={() => void handleTelegramShare()} type="button">Telegram’da yuborish</button>
+            <button className="listing-secondary" onClick={() => void handleCopyTelegramMessage()} type="button">Xabarni nusxalash</button>
+          </div>
+          {shareFeedback && <p className="listing-share-feedback" role="status">{shareFeedback}</p>}
+        </section>}
         <Link className="listing-primary" href="/account">Shaxsiy kabinetga qaytish</Link>
       </section>
     )

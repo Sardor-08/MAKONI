@@ -30,6 +30,7 @@ export const paymentSettings = pgTable('payment_settings', {
   bankName: text('bankName').notNull().default(''),
   cardNumber: text('cardNumber').notNull().default(''),
   cardHolder: text('cardHolder').notNull().default(''),
+  telegramUsername: text('telegramUsername').notNull().default(''),
   instructions: text('instructions').notNull().default(''),
   updatedBy: text('updatedBy'),
   updatedAt: timestamp('updatedAt', { withTimezone: true }).notNull().defaultNow(),
@@ -53,6 +54,19 @@ export const paymentSubmissions = pgTable('payment_submissions', {
 }, (table) => [
   index('payment_submissions_status_created_idx').on(table.status, desc(table.createdAt)),
   index('payment_submissions_user_created_idx').on(table.userId, desc(table.createdAt)),
+])
+
+export const walletTransactions = pgTable('wallet_transactions', {
+  id: text('id').primaryKey(),
+  userId: text('userId').notNull(),
+  actorUserId: text('actorUserId').notNull(),
+  amountDelta: bigint('amountDelta', { mode: 'number' }).notNull(),
+  balanceAfter: bigint('balanceAfter', { mode: 'number' }).notNull(),
+  note: text('note').notNull(),
+  createdAt: timestamp('createdAt', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  index('wallet_transactions_user_created_idx').on(table.userId, desc(table.createdAt)),
+  index('wallet_transactions_created_idx').on(desc(table.createdAt)),
 ])
 
 export const auditLogs = pgTable('audit_logs', {

@@ -1,12 +1,12 @@
 'use server'
 
 import { randomUUID } from 'node:crypto'
-import { and, desc, eq } from 'drizzle-orm'
+import { and, desc, eq, sql } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { requireAdmin } from '@/lib/admin'
 import { db } from '@/lib/db'
-import { auditLogs, listingPlans, paymentSettings, paymentSubmissions, properties } from '@/lib/db/schema'
+import { auditLogs, listingPlans, paymentSettings, paymentSubmissions, properties, user, walletTransactions } from '@/lib/db/schema'
 
 const planSchema = z.object({
   id: z.string().min(1).max(80),
@@ -25,6 +25,7 @@ const settingsSchema = z.object({
   bankName: z.string().trim().max(120),
   cardNumber: z.string().trim().max(40).refine((value) => value === '' || /^\d{4}(?: ?\d{4}){3}$/.test(value)),
   cardHolder: z.string().trim().max(120),
+  telegramUsername: z.string().trim().max(33).transform((value) => value.replace(/^@/, '')).refine((value) => value === '' || /^[A-Za-z0-9_]{5,32}$/.test(value)),
   instructions: z.string().trim().max(1000),
 })
 
@@ -72,12 +73,66 @@ export async function updatePaymentSettings(input: unknown) {
       action: 'admin.payment_settings.updated',
       subjectType: 'payment_settings',
       subjectId: '1',
-      metadata: { bankNameChanged: Boolean(parsed.data.bankName), cardUpdated: Boolean(parsed.data.cardNumber) },
+      metadata: { bankNameChanged: Boolean(parsed.data.bankName), cardUpdated: Boolean(parsed.data.cardNumber), telegramConfigured: Boolean(parsed.data.telegramUsername) },
     })
   })
 
   revalidatePath('/admin')
   revalidatePath('/list-property')
+  return { ok: true }
+}
+
+const balanceSchema = z.object({
+  email: z.string().trim().email().max(254),
+  targetBalance: z.number().int().min(0).max(1_000_000_000_000),
+  note: z.string().trim().min(3).max(300),
+})
+
+export async function setUserBalance(input: unknown) {
+  const admin = await requireAdmin()
+  const parsed = balanceSchema.safeParse(input)
+  if (!parsed.success) return { ok: false, error: 'Balans ma’lumotlarini tekshiring.' }
+
+  const result = await db.transaction(async (tx) => {
+    const [target] = await tx.select({ id: user.id, email: user.email })
+      .from(user)
+      .where(sql`lower(${user.email}) = ${parsed.data.email.toLowerCase()}`)
+      .for('update')
+      .limit(1)
+    if (!target) return 'missing' as const
+
+    const [balanceRow] = await tx.select({ total: sql<string>`coalesce(sum(${walletTransactions.amountDelta}), 0)` })
+      .from(walletTransactions)
+      .where(eq(walletTransactions.userId, target.id))
+    const currentBalance = Number(balanceRow?.total ?? 0)
+    const delta = parsed.data.targetBalance - currentBalance
+    if (!Number.isSafeInteger(currentBalance) || !Number.isSafeInteger(delta)) return 'invalid' as const
+    if (delta === 0) return 'unchanged' as const
+
+    await tx.insert(walletTransactions).values({
+      id: randomUUID(),
+      userId: target.id,
+      actorUserId: admin.id,
+      amountDelta: delta,
+      balanceAfter: parsed.data.targetBalance,
+      note: parsed.data.note,
+    })
+    await tx.insert(auditLogs).values({
+      id: randomUUID(),
+      actorUserId: admin.id,
+      action: 'admin.balance.adjusted',
+      subjectType: 'user_balance',
+      subjectId: target.id,
+      metadata: { email: target.email, previousBalance: currentBalance, balanceAfter: parsed.data.targetBalance, amountDelta: delta },
+    })
+    return 'updated' as const
+  })
+
+  if (result === 'missing') return { ok: false, error: 'Bu email bilan foydalanuvchi topilmadi.' }
+  if (result === 'invalid') return { ok: false, error: 'Balans xavfsiz hisoblash chegarasidan oshdi.' }
+  if (result === 'unchanged') return { ok: false, error: 'Foydalanuvchi balansi allaqachon shu miqdorda.' }
+  revalidatePath('/admin')
+  revalidatePath('/account')
   return { ok: true }
 }
 

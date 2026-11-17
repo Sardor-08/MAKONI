@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
         payerPhone: parsed.data.payerPhone,
         reference: parsed.data.reference || null,
         receiptPath: parsed.data.receiptPath,
-      }).returning({ id: paymentSubmissions.id, status: paymentSubmissions.status })
+      }).returning({ id: paymentSubmissions.id, status: paymentSubmissions.status, amount: paymentSubmissions.amount })
 
       await tx.insert(auditLogs).values({
         id: randomUUID(),

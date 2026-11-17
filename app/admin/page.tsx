@@ -6,7 +6,7 @@ import { AdminDashboard } from '@/components/admin-dashboard'
 import { ADMIN_EMAIL } from '@/lib/admin'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { auditLogs, listingPlans, paymentSettings, paymentSubmissions, properties, user } from '@/lib/db/schema'
+import { auditLogs, listingPlans, paymentSettings, paymentSubmissions, properties, user, walletTransactions } from '@/lib/db/schema'
 
 export const metadata: Metadata = {
   title: 'Boshqaruv paneli — MAKONI',
@@ -21,7 +21,7 @@ export default async function AdminPage() {
   if (!session?.user) redirect('/sign-in?returnTo=%2Fadmin')
   if (session.user.email.trim().toLowerCase() !== ADMIN_EMAIL) notFound()
 
-  const [plans, settings, payments, listings, audits, [pendingCount], [activeCount], [totalListings]] = await Promise.all([
+  const [plans, settings, payments, listings, audits, balanceChanges, [pendingCount], [activeCount], [totalListings]] = await Promise.all([
     db.select().from(listingPlans).orderBy(listingPlans.displayOrder),
     db.select().from(paymentSettings).where(eq(paymentSettings.id, 1)).limit(1),
     db.select({
@@ -70,6 +70,11 @@ export default async function AdminPage() {
       .leftJoin(user, eq(auditLogs.actorUserId, user.id))
       .orderBy(desc(auditLogs.createdAt))
       .limit(100),
+    db.select({ id: walletTransactions.id, userId: walletTransactions.userId, amountDelta: walletTransactions.amountDelta, balanceAfter: walletTransactions.balanceAfter, note: walletTransactions.note, createdAt: walletTransactions.createdAt, userName: user.name, userEmail: user.email })
+      .from(walletTransactions)
+      .leftJoin(user, eq(walletTransactions.userId, user.id))
+      .orderBy(desc(walletTransactions.createdAt))
+      .limit(100),
     db.select({ value: count() }).from(paymentSubmissions).where(eq(paymentSubmissions.status, 'pending')),
     db.select({ value: count() }).from(properties).where(and(eq(properties.isPublished, true), or(isNull(properties.expiresAt), gt(properties.expiresAt, new Date())))),
     db.select({ value: count() }).from(properties),
@@ -79,10 +84,11 @@ export default async function AdminPage() {
     <AdminDashboard
       admin={{ name: session.user.name, email: session.user.email }}
       plans={plans}
-      settings={settings[0] ?? { id: 1, bankName: '', cardNumber: '', cardHolder: '', instructions: '', updatedBy: null, updatedAt: new Date() }}
+      settings={settings[0] ?? { id: 1, bankName: '', cardNumber: '', cardHolder: '', telegramUsername: '', instructions: '', updatedBy: null, updatedAt: new Date() }}
       payments={payments}
       listings={listings}
       audits={audits}
+      balanceChanges={balanceChanges}
       stats={{ pendingPayments: Number(pendingCount?.value ?? 0), activeListings: Number(activeCount?.value ?? 0), totalListings: Number(totalListings?.value ?? 0) }}
     />
   )

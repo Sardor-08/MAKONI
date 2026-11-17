@@ -3,17 +3,18 @@
 import { useState, useTransition, type FormEvent } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Activity, ArrowDownRight, ArrowUpRight, BadgeCheck, Building2, Check, ChevronRight, Clock3, CreditCard, Eye, EyeOff, FileCheck2, FileText, Home, LayoutDashboard, ListChecks, Save, Settings2, ShieldCheck, X } from 'lucide-react'
-import { reviewPaymentSubmission, setAdminListingVisibility, updateListingPlan, updatePaymentSettings } from '@/app/actions/admin'
+import { Activity, ArrowDownRight, ArrowUpRight, BadgeCheck, Building2, Check, ChevronRight, Clock3, CreditCard, Eye, EyeOff, FileCheck2, FileText, Home, LayoutDashboard, ListChecks, Save, Settings2, ShieldCheck, Wallet, X } from 'lucide-react'
+import { reviewPaymentSubmission, setAdminListingVisibility, setUserBalance, updateListingPlan, updatePaymentSettings } from '@/app/actions/admin'
 import { SignOutButton } from '@/components/sign-out-button'
 
 type Plan = { id: string; name: string; description: string; price: number; durationDays: number; maxPhotos: number; premium: boolean; featured: boolean; isActive: boolean; displayOrder: number }
-type Settings = { id: number; bankName: string; cardNumber: string; cardHolder: string; instructions: string; updatedBy: string | null; updatedAt: Date }
+type Settings = { id: number; bankName: string; cardNumber: string; cardHolder: string; telegramUsername: string; instructions: string; updatedBy: string | null; updatedAt: Date }
 type Payment = { id: string; userId: string; propertyId: number; planId: string; amount: number; payerName: string; payerPhone: string; reference: string | null; receiptPath: string; status: string; reviewNote: string | null; createdAt: Date; propertyTitle: string; region: string; district: string; ownerName: string | null; ownerEmail: string | null }
 type Listing = { id: number; title: string; region: string; district: string; price: number; planId: string | null; isPublished: boolean; expiresAt: Date | null; createdAt: Date; ownerName: string | null; ownerEmail: string | null }
 type Audit = { id: string; actorUserId: string | null; action: string; subjectType: string; subjectId: string | null; metadata: Record<string, unknown>; createdAt: Date; actorEmail: string | null }
-type Props = { admin: { name: string; email: string }; plans: Plan[]; settings: Settings; payments: Payment[]; listings: Listing[]; audits: Audit[]; stats: { pendingPayments: number; activeListings: number; totalListings: number } }
-type Tab = 'overview' | 'payments' | 'listings' | 'plans' | 'settings' | 'audit'
+type BalanceChange = { id: string; userId: string; amountDelta: number; balanceAfter: number; note: string; createdAt: Date; userName: string | null; userEmail: string | null }
+type Props = { admin: { name: string; email: string }; plans: Plan[]; settings: Settings; payments: Payment[]; listings: Listing[]; audits: Audit[]; balanceChanges: BalanceChange[]; stats: { pendingPayments: number; activeListings: number; totalListings: number } }
+type Tab = 'overview' | 'payments' | 'listings' | 'plans' | 'settings' | 'balance' | 'audit'
 
 const money = new Intl.NumberFormat('uz-UZ')
 const dateFormat = new Intl.DateTimeFormat('uz-UZ', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
@@ -23,6 +24,7 @@ const nav: { id: Tab; title: string; icon: typeof LayoutDashboard }[] = [
   { id: 'listings', title: 'E’lonlar', icon: Building2 },
   { id: 'plans', title: 'Tariflar', icon: ListChecks },
   { id: 'settings', title: 'To‘lov sozlamalari', icon: CreditCard },
+  { id: 'balance', title: 'Foydalanuvchi balansi', icon: Wallet },
   { id: 'audit', title: 'Xavfsizlik jurnali', icon: Activity },
 ]
 
@@ -41,7 +43,7 @@ function StatCard({ label, value, caption, icon: Icon, tone }: { label: string; 
   return <article className="admin-stat-card"><span className={`admin-stat-icon ${tone}`}><Icon aria-hidden="true" /></span><div><p>{label}</p><strong>{value}</strong><small>{caption}</small></div></article>
 }
 
-export function AdminDashboard({ admin, plans, settings, payments, listings, audits, stats }: Props) {
+export function AdminDashboard({ admin, plans, settings, payments, listings, audits, balanceChanges, stats }: Props) {
   const router = useRouter()
   const [tab, setTab] = useState<Tab>('overview')
   const [message, setMessage] = useState('')
@@ -96,11 +98,32 @@ export function AdminDashboard({ admin, plans, settings, payments, listings, aud
         bankName: fields.get('bankName'),
         cardNumber: fields.get('cardNumber'),
         cardHolder: fields.get('cardHolder'),
+        telegramUsername: fields.get('telegramUsername'),
         instructions: fields.get('instructions'),
       })
       showResult(result.ok, result.ok ? 'To‘lov ma’lumotlari saqlandi.' : result.error ?? 'To‘lov sozlamalarini saqlab bo‘lmadi.')
     } catch {
       setError('To‘lov sozlamalarini saqlab bo‘lmadi. Qayta urinib ko‘ring.')
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  async function handleBalanceSave(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setBusyId('balance')
+    setMessage('')
+    setError('')
+    const fields = new FormData(event.currentTarget)
+    try {
+      const result = await setUserBalance({
+        email: String(fields.get('email') ?? ''),
+        targetBalance: Number(fields.get('targetBalance')),
+        note: String(fields.get('note') ?? ''),
+      })
+      showResult(result.ok, result.ok ? 'Foydalanuvchi balansi yangilandi va tarixga yozildi.' : result.error ?? 'Balansni yangilab bo‘lmadi.')
+    } catch {
+      setError('Balansni yangilab bo‘lmadi. Qayta urinib ko‘ring.')
     } finally {
       setBusyId(null)
     }
@@ -191,7 +214,25 @@ export function AdminDashboard({ admin, plans, settings, payments, listings, aud
 
           {tab === 'plans' && <section className="admin-plan-grid" aria-label="Tarif sozlamalari">{plans.map((plan) => <article className="admin-plan-card" key={plan.id}><div className="admin-plan-card-head"><span className={plan.isActive ? 'admin-plan-active' : 'admin-plan-inactive'}><i aria-hidden="true" />{plan.isActive ? 'Faol' : 'O‘chirilgan'}</span><strong>{plan.id}</strong></div><form onSubmit={(event) => void handlePlanSave(event, plan)}><label>Tarif nomi<input name="name" defaultValue={plan.name} required maxLength={80} /></label><label>Tavsif<textarea name="description" defaultValue={plan.description} required maxLength={300} rows={2} /></label><div className="admin-form-row"><label>Narxi (so‘m)<input name="price" type="number" min={0} max={1000000000} step={1000} defaultValue={plan.price} required /></label><label>Muddati (kun)<input name="durationDays" type="number" min={1} max={365} defaultValue={plan.durationDays} required /></label></div><div className="admin-form-row"><label>Rasm limiti<input name="maxPhotos" type="number" min={1} max={12} defaultValue={plan.maxPhotos} required /></label><label>Tartib raqami<input name="displayOrder" type="number" min={0} max={1000} defaultValue={plan.displayOrder} required /></label></div><div className="admin-check-options"><label><input type="checkbox" name="premium" defaultChecked={plan.premium} /> Premium ko‘rinish</label><label><input type="checkbox" name="featured" defaultChecked={plan.featured} /> Tavsiya etilgan</label><label><input type="checkbox" name="isActive" defaultChecked={plan.isActive} /> Sotuvda faol</label></div><button className="admin-save-button" disabled={busyId === plan.id}><Save aria-hidden="true" />{busyId === plan.id ? 'Saqlanmoqda…' : 'Tarifni saqlash'}</button></form></article>)}</section>}
 
-          {tab === 'settings' && <section className="admin-panel admin-settings-panel"><div className="admin-panel-heading"><div><p className="admin-eyebrow">MANUAL TO‘LOV</p><h2>Karta va yo‘riqnoma</h2><p>Bu ma’lumotlar e’lon joylayotgan mijozlarga ko‘rsatiladi. O‘zgarishlar auditda qayd etiladi.</p></div><span className="admin-security-tag"><ShieldCheck aria-hidden="true" /> Faqat admin tahrirlaydi</span></div><form className="admin-settings-form" onSubmit={(event) => void handleSettingsSave(event)}><label>Bank nomi<input name="bankName" defaultValue={settings.bankName} maxLength={120} placeholder="Masalan, Xalq banki" /></label><label>Karta raqami<input name="cardNumber" inputMode="numeric" autoComplete="off" defaultValue={settings.cardNumber} maxLength={23} placeholder="0000 0000 0000 0000" /><small>16 raqam, bo‘sh joy bilan yozish mumkin.</small></label><label>Karta egasi<input name="cardHolder" defaultValue={settings.cardHolder} maxLength={120} placeholder="Ism Familiya" /></label><label className="admin-settings-wide">To‘lov bo‘yicha ko‘rsatma<textarea name="instructions" defaultValue={settings.instructions} maxLength={1000} rows={4} placeholder="To‘lov izohida e’lon ID raqamini ko‘rsating…" /></label><div className="admin-settings-footer"><span>Yangilangan: {dateFormat.format(new Date(settings.updatedAt))}</span><button className="admin-save-button" disabled={busyId === 'settings'}><Save aria-hidden="true" />{busyId === 'settings' ? 'Saqlanmoqda…' : 'Sozlamalarni saqlash'}</button></div></form></section>}
+          {tab === 'settings' && <section className="admin-panel admin-settings-panel"><div className="admin-panel-heading"><div><p className="admin-eyebrow">MANUAL TO‘LOV</p><h2>Karta va yo‘riqnoma</h2><p>Bu ma’lumotlar e’lon joylayotgan mijozlarga ko‘rsatiladi. O‘zgarishlar auditda qayd etiladi.</p></div><span className="admin-security-tag"><ShieldCheck aria-hidden="true" /> Faqat admin tahrirlaydi</span></div><form className="admin-settings-form" onSubmit={(event) => void handleSettingsSave(event)}><label>Bank nomi<input name="bankName" defaultValue={settings.bankName} maxLength={120} placeholder="Masalan, Xalq banki" /></label><label>Karta raqami<input name="cardNumber" inputMode="numeric" autoComplete="off" defaultValue={settings.cardNumber} maxLength={23} placeholder="0000 0000 0000 0000" /><small>16 raqam, bo‘sh joy bilan yozish mumkin.</small></label><label>Karta egasi<input name="cardHolder" defaultValue={settings.cardHolder} maxLength={120} placeholder="Ism Familiya" /></label><label>Telegram username<input name="telegramUsername" defaultValue={settings.telegramUsername ? `@${settings.telegramUsername}` : ''} maxLength={33} autoComplete="off" placeholder="@makoni_admin" /><small>To‘lov xabari yuboriladigan admin akkaunti.</small></label><label className="admin-settings-wide">To‘lov bo‘yicha ko‘rsatma<textarea name="instructions" defaultValue={settings.instructions} maxLength={1000} rows={4} placeholder="To‘lov izohida e’lon ID raqamini ko‘rsating…" /></label><div className="admin-settings-footer"><span>Yangilangan: {dateFormat.format(new Date(settings.updatedAt))}</span><button className="admin-save-button" disabled={busyId === 'settings'}><Save aria-hidden="true" />{busyId === 'settings' ? 'Saqlanmoqda…' : 'Sozlamalarni saqlash'}</button></div></form></section>}
+
+          {tab === 'balance' && (
+            <>
+              <section className="admin-panel admin-balance-panel">
+                <div className="admin-panel-heading"><div><p className="admin-eyebrow">QO‘LDA BOSHQARUV</p><h2>Foydalanuvchi balansini belgilash</h2><p>Email orqali topilgan foydalanuvchining yangi umumiy balansini kiriting. Farq alohida, o‘chirilmaydigan jurnalga yoziladi.</p></div><span className="admin-security-tag"><ShieldCheck aria-hidden="true" /> Admin amali</span></div>
+                <form className="admin-balance-form" onSubmit={(event) => void handleBalanceSave(event)}>
+                  <label>Foydalanuvchi email<input name="email" type="email" required maxLength={254} autoComplete="off" placeholder="foydalanuvchi@example.com" /></label>
+                  <label>Yangi balans (so‘m)<input name="targetBalance" type="number" min={0} max={1000000000000} step={1000} defaultValue={0} required /></label>
+                  <label className="admin-balance-wide">O‘zgarish sababi<textarea name="note" minLength={3} maxLength={300} rows={3} required placeholder="Masalan, to‘lov tasdiqlandi" /></label>
+                  <div className="admin-balance-footer"><span>Balans har doim bazadagi tranzaksiyalar tarixidan hisoblanadi.</span><button className="admin-save-button" disabled={busyId === 'balance'} type="submit"><Save aria-hidden="true" />{busyId === 'balance' ? 'Saqlanmoqda…' : 'Balansni saqlash'}</button></div>
+                </form>
+              </section>
+              <section className="admin-panel admin-balance-history">
+                <div className="admin-panel-heading"><div><p className="admin-eyebrow">SAQLANGAN TARIX</p><h2>Oxirgi balans o‘zgarishlari</h2><p>{balanceChanges.length} ta oxirgi yozuv. Har bir o‘zgarish admin audit jurnaliga ham tushadi.</p></div></div>
+                {balanceChanges.length ? <div className="admin-balance-list">{balanceChanges.map((change) => <article className="admin-balance-row" key={change.id}><div><strong>{change.userName || 'Foydalanuvchi'}</strong><p>{change.userEmail || change.userId}</p><small>{change.note}</small></div><div className="admin-balance-values"><strong className={change.amountDelta < 0 ? 'is-negative' : 'is-positive'}>{change.amountDelta > 0 ? '+' : '−'}{money.format(Math.abs(change.amountDelta))} so‘m</strong><span>Yangi balans: {money.format(change.balanceAfter)} so‘m</span><time dateTime={new Date(change.createdAt).toISOString()}>{dateFormat.format(new Date(change.createdAt))}</time></div></article>)}</div> : <div className="admin-empty"><Wallet aria-hidden="true" /><strong>Balans o‘zgarishlari hali yo‘q</strong><span>Admin kiritgan barcha o‘zgarishlar shu yerda qoladi.</span></div>}
+              </section>
+            </>
+          )}
 
           {tab === 'audit' && <section className="admin-panel"><div className="admin-panel-heading"><div><p className="admin-eyebrow">O‘ZGARTIRIB BO‘LMAYDIGAN TARIX</p><h2>Xavfsizlik jurnali</h2><p>Oxirgi 100 ta muhim amal. Parol, karta cheki yoki maxfiy fayl mazmuni jurnalda saqlanmaydi.</p></div><span className="admin-security-tag"><Activity aria-hidden="true" /> {audits.length} yozuv</span></div><div className="admin-audit-list">{audits.map((audit) => <article className="admin-audit-row" key={audit.id}><span className="admin-audit-icon"><Activity aria-hidden="true" /></span><div className="admin-audit-copy"><strong>{audit.action.replaceAll('.', ' · ')}</strong><p>{audit.subjectType}{audit.subjectId ? ` #${audit.subjectId}` : ''} <span>·</span> {audit.actorEmail || 'Tizim'}</p></div><time dateTime={new Date(audit.createdAt).toISOString()}>{dateFormat.format(new Date(audit.createdAt))}</time><details><summary>Meta</summary><pre>{JSON.stringify(audit.metadata, null, 2)}</pre></details></article>)}{audits.length === 0 && <div className="admin-empty"><Activity aria-hidden="true" /><strong>Audit yozuvlari yo‘q</strong></div>}</div></section>}
 

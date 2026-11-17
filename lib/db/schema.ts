@@ -61,7 +61,7 @@ export const verification = pgTable('verification', {
   updatedAt: timestamp('updatedAt').defaultNow(),
 })
 
-export { auditLogs, listingPlans, paymentSettings, paymentSubmissions } from './marketplace-schema'
+export { auditLogs, listingPlans, paymentSettings, paymentSubmissions, walletTransactions } from './marketplace-schema'
 
 export const properties = pgTable(
   'properties',

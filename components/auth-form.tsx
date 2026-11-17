@@ -8,9 +8,10 @@ import { sendVerificationEmail, signIn, signUp } from '@/lib/auth-client'
 type AuthFormProps = {
   mode: 'sign-in' | 'sign-up'
   returnTo: string
+  googleEnabled: boolean
 }
 
-export function AuthForm({ mode, returnTo }: AuthFormProps) {
+export function AuthForm({ mode, returnTo, googleEnabled }: AuthFormProps) {
   const router = useRouter()
   const emailRef = useRef<HTMLInputElement>(null)
   const [name, setName] = useState('')
@@ -87,6 +88,24 @@ export function AuthForm({ mode, returnTo }: AuthFormProps) {
     }
   }
 
+  async function handleGoogleSignIn() {
+    if (busy) return
+    setError('')
+    setSuccess('')
+    setPending(true)
+    try {
+      const result = await signIn.social({
+        provider: 'google',
+        callbackURL: `${window.location.origin}${returnTo}`,
+      })
+      if (result.error) setError('Google orqali kirib bo‘lmadi. Qayta urinib ko‘ring.')
+    } catch {
+      setError('Google orqali kirib bo‘lmadi. Qayta urinib ko‘ring.')
+    } finally {
+      setPending(false)
+    }
+  }
+
   async function handleResendVerification() {
     const email = emailRef.current?.value.trim()
     if (!email) {
@@ -114,6 +133,15 @@ export function AuthForm({ mode, returnTo }: AuthFormProps) {
 
   return (
     <form className="auth-form" aria-busy={busy} onSubmit={handleSubmit}>
+      {googleEnabled && (
+        <>
+          <button className="auth-google-button" disabled={busy} onClick={() => void handleGoogleSignIn()} type="button">
+            <span className="auth-google-mark" aria-hidden="true">G</span>
+            Google orqali {isSignUp ? 'ro‘yxatdan o‘tish' : 'kirish'}
+          </button>
+          <div className="auth-divider"><span>yoki email bilan</span></div>
+        </>
+      )}
       {isSignUp && (
         <label className="auth-field">
           Ism va familiya

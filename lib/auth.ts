@@ -2,6 +2,10 @@ import { betterAuth } from 'better-auth'
 import { pool } from '@/lib/db'
 import { sendAuthEmail } from '@/lib/auth-email'
 
+const googleClientId = process.env.GOOGLE_CLIENT_ID
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET
+const googleAuthEnabled = Boolean(googleClientId && googleClientSecret)
+
 export const auth = betterAuth({
   database: pool,
   baseURL:
@@ -59,6 +63,22 @@ export const auth = betterAuth({
         ]
       : []),
   ],
+  ...(googleAuthEnabled
+    ? {
+        socialProviders: {
+          google: {
+            clientId: googleClientId!,
+            clientSecret: googleClientSecret!,
+          },
+        },
+        account: {
+          accountLinking: {
+            enabled: true,
+            trustedProviders: ['google'] as const,
+          },
+        },
+      }
+    : {}),
   session: {
     expiresIn: 60 * 60 * 24 * 30,
     updateAge: 60 * 60 * 24 * 7,

@@ -52,11 +52,21 @@ export async function GET() {
         eq(properties.isPublished, true),
         or(isNull(properties.expiresAt), gt(properties.expiresAt, new Date())),
       ))
-      .orderBy(desc(properties.createdAt))
+      .orderBy(desc(properties.premium), desc(properties.createdAt))
       .limit(100)
 
+    const premiumRows = rows.filter((row) => row.premium)
+    const standardRows = rows.filter((row) => !row.premium)
+    const premiumOffset = premiumRows.length
+      ? Math.floor(Date.now() / (15 * 60 * 1000)) % premiumRows.length
+      : 0
+    const rotatedPremiumRows = [
+      ...premiumRows.slice(premiumOffset),
+      ...premiumRows.slice(0, premiumOffset),
+    ]
+
     return NextResponse.json({
-      listings: rows.map((row) => ({ ...row, img: propertyImageSource(row.img) })),
+      listings: [...rotatedPremiumRows, ...standardRows].map((row) => ({ ...row, img: propertyImageSource(row.img) })),
     }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (error) {
     console.error('[makoni] Public listing query failed:', error)

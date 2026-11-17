@@ -4,7 +4,7 @@ import { useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'rea
 import Link from 'next/link'
 import { upload } from '@vercel/blob/client'
 import { useRouter } from 'next/navigation'
-import { ArrowUpRight, Camera, Check, ChevronRight, CircleUserRound, Eye, EyeOff, House, LayoutDashboard, ListChecks, Plus, Search, Trash2, UserRound } from 'lucide-react'
+import { ArrowUpRight, Camera, Check, ChevronRight, CircleUserRound, Eye, EyeOff, House, LayoutDashboard, ListChecks, Plus, Search, Trash2, UserRound, Wallet } from 'lucide-react'
 import { deleteListing, saveProfile, setListingPublished } from '@/app/actions/account'
 import { SignOutButton } from '@/components/sign-out-button'
 
@@ -92,7 +92,7 @@ function PortfolioPulse({ total, published }: { total: number; published: number
   )
 }
 
-export function AccountDashboard({ account, listings }: { account: Account; listings: Listing[] }) {
+export function AccountDashboard({ account, listings, walletBalance }: { account: Account; listings: Listing[]; walletBalance: number }) {
   const router = useRouter()
   const fileInput = useRef<HTMLInputElement>(null)
   const [filter, setFilter] = useState<StatusFilter>('all')
@@ -260,6 +260,7 @@ export function AccountDashboard({ account, listings }: { account: Account; list
             <article className="crm-stat-card"><span className="crm-stat-icon crm-stat-icon-green"><Eye aria-hidden="true" /></span><div><p>Saytda faol</p><strong>{publishedCount}</strong><small>Ommaviy ro‘yxatda ko‘rinadi</small></div></article>
             <article className="crm-stat-card"><span className="crm-stat-icon crm-stat-icon-muted"><EyeOff aria-hidden="true" /></span><div><p>Yashirilgan</p><strong>{hiddenCount}</strong><small>Faqat sizga ko‘rinadi</small></div></article>
             <article className="crm-stat-card"><span className="crm-stat-icon crm-stat-icon-gold"><House aria-hidden="true" /></span><div><p>Jami e’lon qiymati</p><strong className="crm-stat-value">{money.format(listedValue)}</strong><small>So‘m, barcha e’lonlar bo‘yicha</small></div></article>
+            <article className="crm-stat-card"><span className="crm-stat-icon crm-stat-icon-green"><Wallet aria-hidden="true" /></span><div><p>Hisob balansi</p><strong className="crm-stat-value">{money.format(walletBalance)} so‘m</strong><small>Admin tasdiqlagan joriy balans</small></div></article>
           </section>
 
           <PortfolioPulse total={listings.length} published={publishedCount} />
@@ -295,7 +296,7 @@ export function AccountDashboard({ account, listings }: { account: Account; list
                     </div>
                     <strong className="crm-listing-price">{money.format(listing.price)} <small>so‘m</small></strong>
                     <div className="crm-listing-actions">
-                      {listing.isExpired ? <Link className="crm-payment-link" href="/list-property">Yangi tarif</Link> : !listing.isPublished && listing.paymentStatus !== 'pending' && <Link className="crm-payment-link" href={`/list-property?property=${listing.id}`}>{listing.paymentStatus === 'rejected' ? 'Qayta yuborish' : 'To‘lov'}</Link>}
+                      {listing.isExpired ? <Link className="crm-payment-link" href="/list-property">Yangi tarif</Link> : !listing.isPublished && listing.paymentStatus === 'pending' ? <Link className="crm-payment-link" href={`/list-property?property=${listing.id}`}>Telegram xabari</Link> : !listing.isPublished && <Link className="crm-payment-link" href={`/list-property?property=${listing.id}`}>{listing.paymentStatus === 'rejected' ? 'Qayta yuborish' : 'To‘lov'}</Link>}
                       {!listing.isExpired && <button className="crm-icon-action" disabled={busyListing === listing.id} onClick={() => void handleVisibility(listing)} type="button" aria-label={listing.isPublished ? 'E’lonni saytdan yashirish' : 'E’lonni saytga chiqarish'} title={listing.isPublished ? 'Yashirish' : 'Saytga chiqarish'}>
                         {listing.isPublished ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
                       </button>}

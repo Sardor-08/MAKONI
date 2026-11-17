@@ -34,7 +34,7 @@ export default async function SignInPage({
         <p className="auth-eyebrow">Xush kelibsiz</p>
         <h1 id="auth-title">Akkauntga kiring</h1>
         <p className="auth-intro">E’lon joylashtirish va boshqarish uchun tizimga kiring.</p>
-        <AuthForm mode="sign-in" returnTo={destination} />
+        <AuthForm mode="sign-in" returnTo={destination} googleEnabled={Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET)} />
         <Link className="auth-back" href="/makoni.html">← E’lonlarga qaytish</Link>
       </section>
     </AuthPageLayout>

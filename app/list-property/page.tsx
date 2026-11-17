@@ -21,19 +21,19 @@ export default async function ListPropertyPage({ searchParams }: PageProps) {
     searchParams,
     auth.api.getSession({ headers: await headers() }),
     db.select().from(listingPlans).orderBy(listingPlans.displayOrder),
-    db.select({ bankName: paymentSettings.bankName, cardNumber: paymentSettings.cardNumber, cardHolder: paymentSettings.cardHolder, instructions: paymentSettings.instructions })
+    db.select({ bankName: paymentSettings.bankName, cardNumber: paymentSettings.cardNumber, cardHolder: paymentSettings.cardHolder, telegramUsername: paymentSettings.telegramUsername, instructions: paymentSettings.instructions })
       .from(paymentSettings).where(eq(paymentSettings.id, 1)).limit(1),
   ])
 
   const parsedPropertyId = Number(params.property)
-  let resumeListing: { id: number; title: string; planId: string; paymentStatus: string | null; reviewNote: string | null } | null = null
+  let resumeListing: { id: number; title: string; planId: string; paymentStatus: string | null; reviewNote: string | null; paymentSubmissionId: string | null; paymentAmount: number | null } | null = null
   if (session?.user && Number.isSafeInteger(parsedPropertyId) && parsedPropertyId > 0) {
     const [listing] = await db.select({ id: properties.id, title: properties.title, planId: properties.planId })
       .from(properties)
       .where(and(eq(properties.id, parsedPropertyId), eq(properties.userId, session.user.id), eq(properties.isPublished, false)))
       .limit(1)
     if (listing?.planId) {
-      const [latestSubmission] = await db.select({ status: paymentSubmissions.status, reviewNote: paymentSubmissions.reviewNote })
+      const [latestSubmission] = await db.select({ id: paymentSubmissions.id, amount: paymentSubmissions.amount, status: paymentSubmissions.status, reviewNote: paymentSubmissions.reviewNote })
         .from(paymentSubmissions)
         .where(and(eq(paymentSubmissions.propertyId, listing.id), eq(paymentSubmissions.userId, session.user.id)))
         .orderBy(desc(paymentSubmissions.createdAt))
@@ -44,6 +44,8 @@ export default async function ListPropertyPage({ searchParams }: PageProps) {
         planId: listing.planId,
         paymentStatus: latestSubmission?.status ?? null,
         reviewNote: latestSubmission?.reviewNote ?? null,
+        paymentSubmissionId: latestSubmission?.id ?? null,
+        paymentAmount: latestSubmission?.amount ?? null,
       }
     }
   }
@@ -67,7 +69,7 @@ export default async function ListPropertyPage({ searchParams }: PageProps) {
 
         <ListingSubmission
           plans={plans}
-          paymentSettings={settings[0] ?? { bankName: '', cardNumber: '', cardHolder: '', instructions: '' }}
+          paymentSettings={settings[0] ?? { bankName: '', cardNumber: '', cardHolder: '', telegramUsername: '', instructions: '' }}
           resumeListing={resumeListing}
           userId={session?.user.id ?? null}
         />
