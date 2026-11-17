@@ -3,6 +3,7 @@ import { get, put } from '@vercel/blob'
 import { headers } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
+import { inspectImageFile, isSameOrigin } from '@/lib/uploads'
 
 export const runtime = 'nodejs'
 
@@ -14,6 +15,7 @@ const allowedImageTypes = new Map([
 const maxImageBytes = 5 * 1024 * 1024
 
 export async function POST(request: NextRequest) {
+  if (!isSameOrigin(request)) return NextResponse.json({ error: 'So‘rov manbasi tasdiqlanmadi.' }, { status: 403 })
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session?.user) return NextResponse.json({ error: 'Tizimga kiring.' }, { status: 401 })
 
@@ -21,7 +23,8 @@ export async function POST(request: NextRequest) {
   const file = formData?.get('file')
   if (!(file instanceof File)) return NextResponse.json({ error: 'Rasm tanlanmadi.' }, { status: 400 })
   const extension = allowedImageTypes.get(file.type)
-  if (!extension || file.size === 0 || file.size > maxImageBytes) {
+  const inspectedImage = await inspectImageFile(file)
+  if (!extension || !inspectedImage || inspectedImage.extension !== extension || file.size > maxImageBytes) {
     return NextResponse.json({ error: 'Faqat 5 MB gacha JPG, PNG yoki WebP rasm qabul qilinadi.' }, { status: 400 })
   }
 

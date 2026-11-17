@@ -34,7 +34,7 @@ export default async function SignUpPage({
         <p className="auth-eyebrow">Yangi hisob</p>
         <h1 id="auth-title">Akkaunt yarating</h1>
         <p className="auth-intro">E’lonlarni joylashtirish uchun ro‘yxatdan o‘ting. Akkauntni faollashtirish uchun emailingizni tasdiqlaysiz.</p>
-        <AuthForm mode="sign-up" returnTo={destination} />
+        <AuthForm mode="sign-up" returnTo={destination} googleEnabled={Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET)} />
         <Link className="auth-back" href="/makoni.html">← E’lonlarga qaytish</Link>
       </section>
     </AuthPageLayout>
