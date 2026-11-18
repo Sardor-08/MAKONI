@@ -60,6 +60,8 @@ export const auth = betterAuth({
           ...(process.env.VERCEL_PROJECT_PRODUCTION_URL
             ? [`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`]
             : []),
+          'https://makoni-one.vercel.app',
+          'https://makoni.uz',
         ]
       : []),
   ],
